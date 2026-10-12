@@ -1,4 +1,4 @@
-# MyMOVE! — v1.1.0
+# MyMOVE! — v1.2.0
 
 **A pocket companion for Veterans in the VA MOVE! Weight Management Program.**
 
@@ -48,6 +48,7 @@ It also lets you:
 - **Water and weight**, for any past day.
 
 ### Program
+- **MOVE! Veteran Workbook link:** the official workbook PDF is linked as the app's companion in the Program tab, the More tab, and every module. Each module shows the workbook pages where its lesson appears.
 - Each module is labeled by week. **You're here** marks your current week and **Review** marks earlier ones.
 - **Go to my week** jumps straight to your current module. Inside a module, use **‹ Week / My week / Week ›** to move between weeks.
 - A **Mark weeks complete** button catches up earlier modules in one tap.
@@ -136,6 +137,7 @@ Program content is adapted and summarized from:
 
 | Version | Date | Notes |
 |---|---|---|
+| 1.2.0 | 2026-10-12 | MOVE! Veteran Workbook (PDF) linked as companion in Program, More and every module, with each module's workbook page range. |
 | 1.1.0 | 2026-10-12 | Support for Veterans already enrolled: start at any week, set program start date and starting weight, auto-complete earlier modules, Weigh-In History for past weigh-ins, check-ins for past weeks, week labels and review navigation in Program, start date and weekly average on Progress. |
 | 1.0.0 | 2026-10-12 | First release: plan setup, Today dashboard, food, activity, water and weight logs, 16 modules + 3 mini-modules, 25 tools, weekly check-in, progress charts, offline PWA, backup and restore. |
 

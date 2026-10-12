@@ -139,7 +139,7 @@ canvas{width:100%;height:220px;display:block}
 (function () {
 'use strict';
 
-var VERSION = '1.1.0';
+var VERSION = '1.2.0';
 var KEY = 'mymove.v1';
 
 /* ---------- Program content (adapted from the MOVE! Veteran Workbook, 2023) ---------- */
@@ -225,6 +225,13 @@ var MODULES = [
   todo:['Review your toolkit','Set your maintenance range and action plan','Plan your next 3 months of goals','Celebrate a milestone'],
   tools:['toolkit','rewards']}
 ];
+var WORKBOOK_URL = 'https://www.move.va.gov/docs/veteranworkbook/MoveVetWorkBook-2023.pdf';
+/* Printed page ranges from the workbook's table of contents */
+var WB_PAGES = {1:'8\u201317',2:'18\u201327',3:'28\u201339',4:'40\u201355',5:'56\u201369',6:'70\u201381',7:'82\u2013101',8:'102\u2013113',9:'114\u2013139',10:'140\u2013157',11:'158\u2013173',12:'174\u2013183',13:'184\u2013195',14:'196\u2013209',15:'210\u2013221',16:'222\u2013231',S:'232\u2013235',T:'236\u2013239',H:'240'};
+function workbookCard(n) {
+  var pg = n != null && WB_PAGES[n] ? WB_PAGES[n] : '';
+  return '<div class="card gold"><div class="row" style="align-items:flex-start"><svg viewBox="0 0 24 24" width="30" height="30" style="flex:0 0 30px;fill:none;stroke:#12284c;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4z"/><path d="M20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/></svg><div class="grow"><b>MOVE! Veteran Workbook</b><div class="small">' + (pg ? 'This lesson is on ' + (pg.indexOf('\u2013') > 0 ? 'pages ' : 'page ') + pg + ' (page numbers printed at the bottom of each page), with worksheets and examples.' : 'The official companion to this app: every lesson, worksheet and example in full.') + '</div></div></div><a class="btn block" style="margin-top:10px" href="' + WORKBOOK_URL + '" target="_blank" rel="noopener">Open the Workbook (PDF)</a><p class="muted small" style="margin:8px 0 0">Opens from move.va.gov and needs internet. Tip: save it to Books or Files to read it offline.</p></div>';
+}
 var MINIS = [
  {n:'S',t:'Weight and Sleep',s:'Mini-module',
   why:'Sleep and weight are linked. Short sleep can increase hunger and cravings and sap the energy you need to stay active.',
@@ -675,6 +682,7 @@ function viewProgram() {
   for (i = 1; i < cm; i++) { if (!(S.mods[i] && S.mods[i].done)) { behind++; } }
   h += '<h1>The MOVE! Program</h1><div class="card"><div class="row between"><b>' + done + ' of 16 modules complete</b><span class="pill">Week ' + w + '</span></div>' + barHtml(done, 16) + '<p class="muted small" style="margin:6px 0 10px">One module a week, in Veteran Workbook order. Pick up at your week, and tap any earlier week to review its lesson. On a different week than your MOVE! group? <a href="#" data-act="editPlan">Change my week</a>.</p>';
   h += '<div class="row wrap"><button class="btn gold sm" data-act="module" data-v="' + cm + '">Go to my week: Module ' + cm + '</button>' + (behind ? '<button class="btn ghost sm" data-act="catchUp">' + (cm === 2 ? 'Mark week 1 complete' : 'Mark weeks 1\u2013' + (cm - 1) + ' complete') + '</button>' : '') + '</div></div>';
+  h += workbookCard(null);
   h += '<div class="card">';
   for (i = 0; i < MODULES.length; i++) { h += modRow(MODULES[i], w); }
   h += '</div><h2>Mini-modules</h2><div class="card">';
@@ -717,7 +725,7 @@ function openModule(n) {
   if (isNum) {
     h += '<div class="row" style="margin-top:12px">' + (md.n > 1 ? '<button class="btn ghost grow" data-act="module" data-v="' + (md.n - 1) + '">\u2039 Week ' + (md.n - 1) + '</button>' : '') + (md.n !== cur ? '<button class="btn ghost grow" data-act="module" data-v="' + cur + '">My week</button>' : '') + (md.n < 16 ? '<button class="btn ghost grow" data-act="module" data-v="' + (md.n + 1) + '">Week ' + (md.n + 1) + ' \u203a</button>' : '') + '</div>';
   }
-  h += '<p class="foot">Want the full lesson? Use your printed MOVE! Veteran Workbook or the PDF on move.va.gov.</p>';
+  h += '<div style="height:12px"></div>' + workbookCard(md.n);
   openSheet((typeof md.n === 'number' ? 'Module ' + md.n + ': ' : '') + md.t, h);
 }
 ACT.module = function (v) { openModule(v); };
@@ -803,6 +811,7 @@ function drawCharts() {
 function viewMore() {
   var h = '<h1>More</h1>';
   h += '<div class="card"><button class="btn gold block" data-act="tool" data-v="checkin">Weekly check-in</button><div style="height:8px"></div><button class="btn ghost block" data-act="editPlan">Edit my plan, week & start date</button><div style="height:8px"></div><button class="btn ghost block" data-act="tool" data-v="weights">Weigh-in history</button><div style="height:8px"></div><button class="btn ghost block" data-act="tool" data-v="rewards">My rewards</button></div>';
+  h += workbookCard(null);
   h += '<div class="card"><h2>Getting started with VA MOVE!</h2><ol class="pts" style="padding-left:4px"><li>Contact your VA MOVE! Program, or tell your VA Primary Care team you\u2019re interested.</li><li>Complete the MOVE!11 Getting Started Questionnaire, online or at your VA.</li><li>Review your MOVE!11 report with your MOVE! team to set first goals.</li><li>Choose a MOVE! option with your team: group sessions, individual sessions, TeleMOVE!, the MOVE! Coach app, or medication and surgery options where appropriate.</li></ol>';
   h += '<p class="small">Not getting care at VA? The Veteran Workbook and MOVE! Coach app are open to anyone.</p>';
   h += '<p><a href="https://www.move.va.gov" target="_blank" rel="noopener">move.va.gov</a> \u00b7 <a href="https://www.move.va.gov/MOVE/GetStarted.asp" target="_blank" rel="noopener">Get Started</a> \u00b7 <a href="https://www.move.va.gov/docs/veteranworkbook/MoveVetWorkBook-2023.pdf" target="_blank" rel="noopener">Veteran Workbook (PDF)</a> \u00b7 <a href="https://www.move.va.gov/SuccessStories/index.asp" target="_blank" rel="noopener">Success Stories</a></p></div>';
