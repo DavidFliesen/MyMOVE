@@ -1,4 +1,4 @@
-# MyMOVE! — v1.4.0
+# MyMOVE! — v1.4.1
 
 **A pocket companion for Veterans in the VA MOVE! Weight Management Program.**
 
@@ -51,6 +51,9 @@ In **Progress → Weigh-in history → Import from a file**:
   - entries that will be skipped: before your start date, future-dated, or outside a normal weight range;
   - any days you've already logged, with an option to replace them.
 - **Several readings on one day:** the earliest is used, which is usually your morning weigh-in.
+- **History older than your start date:** the preview offers to move your program start back to your earliest weigh-in, and shows what your new week number would be.
+- **Starting over:** your starting weigh-in can be edited but not deleted. **Clear all weigh-ins except my start** removes everything else so you can import again from scratch.
+- **Spreadsheets:** Excel or Numbers files (.xlsx, .numbers) need to be exported as CSV first; the app tells you how.
 
 ### Today
 The Today screen shows:
@@ -166,6 +169,7 @@ Program content is adapted and summarized from:
 
 | Version | Date | Notes |
 |---|---|---|
+| 1.4.1 | 2026-10-12 | Import fixes: the file picker no longer restricts file types (iOS was greying files out) and opens reliably for repeat imports; the preview offers to move your start date back to include older history; an Edit button on the starting weigh-in; Clear all weigh-ins except my start; clear messages for spreadsheet and other unreadable files; the celebration banner no longer blocks taps. |
 | 1.4.0 | 2026-10-12 | Encouragement throughout: milestone celebrations (first pound, every 5 lb, 5/8/10%, goal), new lows, kind messages when weight goes up, a safety note for losing too fast, activity, step, water, streak, SMART goal, module and check-in praise, and a Your wins card on Today. Bulk weigh-in import from Apple Health export.xml and CSV (Weight Gurus, Garmin, Fitbit, MyFitnessPal, spreadsheets), with lb/kg handling, preview, skip rules and optional replace. |
 | 1.3.0 | 2026-10-12 | Daily step count and step goal; built-in food search with automatic calorie calculation by servings, plus remembered My Foods and Save & add another. Layout fixes so fields never overlap or run off-screen, and overlays no longer slide under the status bar. Removed Getting Started and crisis cards from More. Modules complete only via Mark Module Complete (removed setup auto-complete and bulk catch-up); Back to Module button in tools; completed badge. Credit changed to David Fliesen. |
 | 1.2.0 | 2026-10-12 | MOVE! Veteran Workbook (PDF) linked as companion in Program, More and every module, with each module's workbook page range. |

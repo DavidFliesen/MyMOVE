@@ -108,7 +108,7 @@ nav#tabs button.on svg{stroke:#1d4f91}
 #sheetbody{flex:1 1 auto;min-height:0;overscroll-behavior:contain;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(24px + env(safe-area-inset-bottom))}
 #toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#12284c;color:#ffffff;padding:11px 18px;border-radius:24px;font-weight:700;font-size:15px;z-index:60;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;text-align:center}
 #toast.show{opacity:1}
-#cheer{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:70;display:none;max-width:696px;margin:0 auto}
+#cheer{pointer-events:none;position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:70;display:none;max-width:696px;margin:0 auto}
 #cheer.show{display:block;-webkit-animation:pop .35s ease-out;animation:pop .35s ease-out}
 .cheerin{display:flex;gap:10px;align-items:flex-start;background:#fff6dd;border:2px solid #f2b632;color:#12284c;border-radius:14px;padding:12px 8px 12px 16px;box-shadow:0 6px 22px rgba(18,40,76,.28)}
 .cheerin .grow{min-width:0;font-weight:400}
@@ -117,7 +117,7 @@ nav#tabs button.on svg{stroke:#1d4f91}
 .cheerin.big{background:#12284c;color:#ffffff;border-color:#f2b632}
 .cheerin.big b{color:#f2b632;font-size:19px}
 .cheerin.big b:before{content:"\2605  "}
-.cheerin button{border:0;background:transparent;font-size:18px;font-weight:800;color:inherit;width:40px;height:40px;flex:0 0 40px;cursor:pointer}
+.cheerin button{pointer-events:auto;border:0;background:transparent;font-size:18px;font-weight:800;color:inherit;width:40px;height:40px;flex:0 0 40px;cursor:pointer}
 @-webkit-keyframes pop{from{-webkit-transform:translateY(24px);opacity:0}to{-webkit-transform:none;opacity:1}}
 @keyframes pop{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 .wins li{margin:0 0 6px 20px}
@@ -166,7 +166,7 @@ th,td{overflow-wrap:anywhere;word-wrap:break-word}
 (function () {
 'use strict';
 
-var VERSION = '1.4.0';
+var VERSION = '1.4.1';
 var KEY = 'mymove.v1';
 
 /* ---------- Program content (adapted from the MOVE! Veteran Workbook, 2023) ---------- */
@@ -1294,11 +1294,20 @@ TOOLFN.weights = function () {
   h += '<div class="card"><h2>History</h2><div class="list">';
   for (i = 0; i < ws.length; i++) {
     var isStart = ws[i].date === p.startDate, diff = r1(ws[i].lb - p.startWeight);
-    h += '<div class="item"><div class="grow"><b>' + ws[i].lb + ' lb</b>' + (isStart ? ' <span class="pill gold">Start</span>' : ' <span class="muted small">' + (diff <= 0 ? '−' + Math.abs(diff) : '+' + diff) + ' lb</span>') + '<div class="muted small">' + fmtLong(ws[i].date) + ' · week ' + weekFromStart2(ws[i].date) + '</div></div>' + (isStart ? '' : '<button class="x" data-act="delWeight" data-v="' + ws[i].date + '" aria-label="Delete">✕</button>') + '</div>';
+    h += '<div class="item"><div class="grow"><b>' + ws[i].lb + ' lb</b>' + (isStart ? ' <span class="pill gold">Start</span>' : ' <span class="muted small">' + (diff <= 0 ? '−' + Math.abs(diff) : '+' + diff) + ' lb</span>') + '<div class="muted small">' + fmtLong(ws[i].date) + ' · week ' + weekFromStart2(ws[i].date) + '</div></div>' + (isStart ? '<button class="btn ghost sm" data-act="editStart">Edit</button>' : '<button class="x" data-act="delWeight" data-v="' + ws[i].date + '" aria-label="Delete">✕</button>') + '</div>';
   }
-  return h + '</div></div>';
+  h += '</div><p class="muted small" style="margin:10px 0 0">Your starting weigh-in anchors your progress, so it can be edited (tap Edit) but not deleted.</p>';
+  if (ws.length > 1) { h += '<button class="btn ghost sm" style="margin-top:10px" data-act="clearWeights">Clear all weigh-ins except my start</button>'; }
+  return h + '</div>';
 };
-AFTER.weights = function () { var fi = $('imp_file'); if (fi) { fi.onchange = function () { handleImportFile(this.files && this.files[0]); this.value = ''; }; } };
+AFTER.weights = function () { var fi = $('imp_file'); if (fi) { fi.onchange = function () { var file = this.files && this.files[0]; if (file) { handleImportFile(file); } }; } };
+ACT.impPick = function () { var fi = $('imp_file'); if (!fi) { return; } try { fi.value = ''; } catch (e) {} impRows = null; fi.click(); };
+ACT.editStart = function () { ACT.editPlan(); };
+ACT.clearWeights = function () {
+  if (!window.confirm('Remove all weigh-ins except your starting weight? Use this to start an import over. This can\u2019t be undone.')) { return; }
+  var p = S.profile, i; for (i = S.weights.length - 1; i >= 0; i--) { if (S.weights[i].date !== p.startDate) { S.weights.splice(i, 1); } }
+  upsertWeight(p.startDate, p.startWeight); save(); ACT.tool('weights'); toast('Weigh-ins cleared. Your start is kept.');
+};
 function weekFromStart2(d) { var n = daysBetween(S.profile.startDate, d); return n < 0 ? 1 : Math.floor(n / 7) + 1; }
 function submitPastWeight() {
   var d = val('pw_d'), lb = r1(num(val('pw_lb')));
@@ -1505,6 +1514,8 @@ function handleImportFile(file) {
   impName = file.name; impRows = null;
   impStatus('<p class="small">Reading <b>' + esc(file.name) + '</b>…</p>');
   var isXml = /\.xml$/i.test(file.name) || /xml/i.test(file.type);
+  if (/\.(xlsx|xls|numbers|ods)$/i.test(file.name)) { impStatus('<div class="card red small" style="margin:10px 0 0">That\u2019s a spreadsheet file (' + esc(file.name.split('.').pop()) + '). Save or export it as <b>CSV</b> first. In Numbers: Share \u2192 Export \u2192 CSV. In Excel: File \u2192 Save a Copy \u2192 CSV. Then choose the .csv file here.</div>'); return; }
+  if (/\.(pdf|json|jpg|jpeg|png|heic|doc|docx)$/i.test(file.name)) { impStatus('<div class="card red small" style="margin:10px 0 0">MyMOVE! can\u2019t read weigh-ins from a ' + esc(file.name.split('.').pop().toUpperCase()) + ' file. Please choose a CSV file or Apple Health\u2019s export.xml.</div>'); return; }
   if (/\.zip$/i.test(file.name)) { impStatus('<div class="card red small" style="margin:10px 0 0">That’s the zipped export. Open it in the Files app first (tap it to unzip), then choose <b>export.xml</b> from the <b>apple_health_export</b> folder.</div>'); return; }
   if (isXml) {
     scanAppleXml(file, function (rows) {
@@ -1554,16 +1565,25 @@ function renderImportPreview(unk) {
     h += '</table>';
   }
   var notes = [];
-  if (before) { notes.push(before + ' before your start date (' + fmtLong(p.startDate) + ') will be skipped. To include them, move your start date earlier in My plan first.'); }
+  var early = null;
+  for (i = 0; i < impRows.length; i++) { lb = impConvert(impRows[i]); if (impRows[i].d < p.startDate && lb >= 70 && lb <= 800 && (!early || impRows[i].d < early.d)) { early = {d: impRows[i].d, lb: lb}; } }
+  if (before) { notes.push(before + ' dated before your program start date (' + fmtLong(p.startDate) + ') won\u2019t be imported unless you move your start date back.'); }
   if (future) { notes.push(future + ' future-dated will be skipped.'); }
   if (bad) { notes.push(bad + ' outside a normal weight range will be skipped. Check the kg setting above.'); }
   if (notes.length) { h += '<ul class="pts small" style="margin:8px 0 0">' + notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>'; }
+  if (early) { h += '<div class="card" style="margin:10px 0 0;padding:12px"><p class="small" style="margin:0 0 8px">Want all of it? Start your program on <b>' + fmtLong(early.d) + '</b> at <b>' + early.lb + ' lb</b>, your earliest weigh-in in this file. Your program week would become <b>week ' + weekFromStart(early.d) + '</b>.</p><button type="button" class="btn ghost sm" data-act="impMoveStart" data-v="' + early.d + '|' + early.lb + '">Use ' + fmtLong(early.d) + ' as my start</button></div>'; }
   if (dup) { h += '<label class="check" style="border:0"><input type="checkbox" id="imp_over"> <span>Replace my ' + dup + ' existing weigh-in' + (dup === 1 ? '' : 's') + ' on the same days</span></label>'; }
   h += add.length ? '<button class="btn gold block" type="button" data-act="impGo" style="margin-top:10px">Import weigh-ins (' + (add.length - dup) + ' new' + (dup ? ', ' + dup + ' already logged' : '') + ')</button>' : '<p class="small" style="margin:8px 0 0"><b>Nothing to import</b> from this file.</p>';
   h += '</div>';
   impStatus(h);
   if ($('imp_kg')) { $('imp_kg').onchange = function () { impKg = this.checked; renderImportPreview(); }; }
 }
+ACT.impMoveStart = function (v) {
+  var a = v.split('|'), p = S.profile;
+  if (!window.confirm('Change your program start to ' + fmtLong(a[0]) + ' at ' + a[1] + ' lb? Your week number will change to week ' + weekFromStart(a[0]) + '. Your current starting weigh-in stays in your history.')) { return; }
+  p.startDate = a[0]; p.startWeight = num(a[1]); p.enrolled = true; upsertWeight(a[0], num(a[1])); save();
+  render(); renderImportPreview(); toast('Start moved to ' + fmtLong(a[0]) + ' \u00b7 now week ' + weekNo());
+};
 ACT.impGo = function () {
   if (!impRows) { return; }
   var over = checked('imp_over'), p = S.profile, n = 0, i, lb, existing = {};
@@ -1591,7 +1611,7 @@ ACT.impSample = function () {
 };
 function importCardHtml() {
   var h = '<div class="card"><h2>Import from a file</h2><p class="small">Bring in many weigh-ins at once from Apple Health, a smart-scale app or a spreadsheet. You’ll see a preview before anything is saved.</p>';
-  h += '<label class="btn block" for="imp_file" style="margin:8px 0 0">Choose a file (.csv or export.xml)</label><input type="file" id="imp_file" accept=".csv,.txt,.xml,text/csv,text/plain,text/xml,application/xml" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">';
+  h += '<button type="button" class="btn block" data-act="impPick" style="margin:8px 0 0">Choose a file (.csv or export.xml)</button><input type="file" id="imp_file" tabindex="-1" aria-hidden="true" style="position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0">';
   h += '<div id="imp_out"></div>';
   h += '<details style="margin-top:12px"><summary class="small" style="cursor:pointer;font-weight:700">Where do I get the file?</summary><ul class="pts small" style="margin-top:8px">';
   h += '<li><b>Apple Health:</b> Health app → your profile picture → <i>Export All Health Data</i> → save to Files. Tap the zip in Files to unzip it, then choose <b>export.xml</b> from the <b>apple_health_export</b> folder. Large exports can take a minute to read.</li>';
