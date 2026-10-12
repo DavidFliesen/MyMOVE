@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MyMOVE!</title>
+<meta name="description" content="MyMOVE! - a companion app that helps Veterans stick with the VA MOVE! Weight Management Program, one week at a time.">
+<meta name="theme-color" content="#12284c">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MyMOVE!">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#eef2f7;color:#1b2533;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%}
+body{padding-bottom:84px;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:#1d4f91}
+.hidden{display:none!important}
+header#top{position:sticky;top:0;z-index:20;background:#12284c;color:#ffffff;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.brand{font-size:22px;font-weight:800;letter-spacing:.3px}
+.brand b{color:#f2b632}
+#topdate{font-size:14px;color:#c9d4e6;text-align:right}
+main#view{max-width:720px;margin:0 auto;padding:14px 14px 24px}
+h1{font-size:24px;margin:4px 0 10px}
+h2{font-size:20px;margin:0 0 8px}
+h3{font-size:17px;margin:12px 0 6px}
+p{margin:0 0 10px}
+.card{background:#ffffff;border-radius:14px;padding:16px;margin:0 0 14px;box-shadow:0 1px 3px rgba(18,40,76,.12)}
+.card.navy{background:#12284c;color:#ffffff}
+.card.navy .muted{color:#c9d4e6}
+.card.gold{background:#fff6dd;border:1px solid #f2d27a}
+.card.red{background:#fdeeee;border:1px solid #f1b8b8}
+.muted{color:#5b6778;font-size:15px}
+.small{font-size:14px}
+.row{display:flex;gap:10px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.between{justify-content:space-between}
+.grow{flex:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.btn{display:inline-block;border:0;border-radius:12px;padding:12px 16px;background:#1d4f91;color:#ffffff;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;min-height:46px}
+.btn.gold{background:#f2b632;color:#12284c}
+.btn.red{background:#b3261e}
+.btn.ghost{background:#e4ebf5;color:#12284c}
+.btn.block{display:block;width:100%}
+.btn.sm{padding:8px 12px;min-height:38px;font-size:15px;border-radius:10px}
+.btn:active{transform:scale(.98)}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.quick .btn{padding:10px 4px;font-size:14px;line-height:1.2}
+.quick .btn span{display:block;font-size:22px;line-height:1.1}
+label{display:block;font-weight:700;font-size:15px;margin:10px 0 4px}
+input[type=text],input[type=number],input[type=date],input[type=time],select,textarea{width:100%;padding:11px 12px;border:1px solid #b9c5d6;border-radius:10px;background:#ffffff;min-height:46px}
+textarea{min-height:84px;resize:vertical}
+input[type=range]{width:100%;height:36px}
+input:focus,select:focus,textarea:focus{outline:3px solid #f2b632;outline-offset:1px}
+.check{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #e6ebf2;font-weight:400;margin:0;font-size:16px}
+.check:last-child{border-bottom:0}
+.check input{width:24px;height:24px;flex:0 0 24px;margin-top:1px;accent-color:#1d4f91}
+.bar{height:14px;background:#e4ebf5;border-radius:8px;overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;background:#2e7d4f;border-radius:8px}
+.bar i.over{background:#c77700}
+.stat{background:#f4f7fb;border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:22px;color:#12284c}
+.stat span{font-size:13px;color:#5b6778}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;background:#e4ebf5;color:#12284c;font-size:13px;font-weight:700}
+.pill.green{background:#dff3e6;color:#1d5e38}
+.pill.gold{background:#fbe7b0;color:#6b4b00}
+.list .item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #e6ebf2}
+.list .item:last-child{border-bottom:0}
+.list .item .x{border:0;background:#f3e2e2;color:#8a1c1c;border-radius:8px;width:34px;height:34px;font-weight:800;cursor:pointer;flex:0 0 34px}
+.seg{display:flex;background:#dfe6f0;border-radius:12px;padding:4px;margin:0 0 12px}
+.seg button{flex:1;border:0;background:transparent;padding:10px 4px;border-radius:9px;font-weight:700;color:#3a4a60;cursor:pointer}
+.seg button.on{background:#ffffff;color:#12284c;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.datebar{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px}
+.datebar button{border:0;background:#ffffff;border-radius:10px;width:46px;height:46px;font-size:20px;font-weight:800;color:#12284c;box-shadow:0 1px 3px rgba(0,0,0,.12);cursor:pointer}
+.mod{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #e6ebf2;cursor:pointer}
+.mod:last-child{border-bottom:0}
+.mod .num{flex:0 0 42px;height:42px;border-radius:50%;background:#e4ebf5;color:#12284c;font-weight:800;display:flex;align-items:center;justify-content:center}
+.mod.done .num{background:#2e7d4f;color:#ffffff}
+.mod.now .num{background:#f2b632;color:#12284c}
+.mod .t{font-weight:700}
+.mod .s{font-size:14px;color:#5b6778}
+.pts li{margin:0 0 8px 20px}
+.goalrow{padding:10px 0;border-bottom:1px solid #e6ebf2}
+.goalrow:last-child{border-bottom:0}
+.dots{display:flex;gap:6px;margin-top:6px}
+.dots button{width:34px;height:34px;border-radius:50%;border:2px solid #b9c5d6;background:#ffffff;font-size:12px;font-weight:700;color:#5b6778;cursor:pointer}
+.dots button.on{background:#2e7d4f;border-color:#2e7d4f;color:#ffffff}
+.dots button.today{border-color:#f2b632}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid #e6ebf2;vertical-align:top}
+th{background:#f4f7fb;font-size:14px}
+td.r,th.r{text-align:right}
+nav#tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#ffffff;border-top:1px solid #d4dce8;display:flex;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 8px rgba(18,40,76,.08)}
+nav#tabs button{flex:1;border:0;background:transparent;padding:8px 2px 9px;color:#5b6778;font-size:12px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav#tabs button svg{width:26px;height:26px;fill:none;stroke:#5b6778;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+nav#tabs button.on{color:#12284c}
+nav#tabs button.on svg{stroke:#1d4f91}
+#sheetwrap{position:fixed;inset:0;z-index:50;background:rgba(10,20,40,.55);display:flex;align-items:flex-end;justify-content:center}
+#sheet{background:#eef2f7;width:100%;max-width:720px;max-height:92vh;border-radius:18px 18px 0 0;display:flex;flex-direction:column;overflow:hidden}
+.sheethead{background:#12284c;color:#ffffff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sheethead h2{margin:0;font-size:19px}
+.sheethead button{border:0;background:#2b4470;color:#ffffff;width:40px;height:40px;border-radius:50%;font-size:18px;font-weight:800;cursor:pointer;flex:0 0 40px}
+#sheetbody{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(24px + env(safe-area-inset-bottom))}
+#toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#12284c;color:#ffffff;padding:11px 18px;border-radius:24px;font-weight:700;font-size:15px;z-index:60;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;text-align:center}
+#toast.show{opacity:1}
+.big{font-size:34px;font-weight:800;color:#12284c;line-height:1.1}
+.timer{font-size:56px;font-weight:800;text-align:center;color:#12284c;font-variant-numeric:tabular-nums;margin:10px 0}
+.breath{width:180px;height:180px;margin:20px auto;border-radius:50%;background:#1d4f91;opacity:.85;transform:scale(.55);transition:transform 4s ease-in-out}
+.breath.in{transform:scale(1)}
+.breathlabel{text-align:center;font-size:22px;font-weight:800;color:#12284c}
+canvas{width:100%;height:220px;display:block}
+.tip{border-left:5px solid #f2b632;padding-left:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.chips button{border:1px solid #b9c5d6;background:#ffffff;border-radius:20px;padding:7px 12px;font-size:14px;cursor:pointer;text-align:left}
+.foot{font-size:13px;color:#5b6778;text-align:center;margin-top:18px}
+@media (max-width:380px){.quick{grid-template-columns:repeat(2,1fr)}.grid3{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header id="top"><div class="brand">My<b>MOVE!</b></div><div id="topdate"></div></header>
+<main id="view"></main>
+<nav id="tabs" class="hidden">
+  <button data-act="tab" data-v="today" id="tab-today"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Today</button>
+  <button data-act="tab" data-v="log" id="tab-log"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Log</button>
+  <button data-act="tab" data-v="program" id="tab-program"><svg viewBox="0 0 24 24"><path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4z"/><path d="M20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/></svg>Program</button>
+  <button data-act="tab" data-v="progress" id="tab-progress"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Progress</button>
+  <button data-act="tab" data-v="more" id="tab-more"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</button>
+</nav>
+<div id="sheetwrap" class="hidden"><div id="sheet" role="dialog" aria-modal="true"><div class="sheethead"><h2 id="sheettitle"></h2><button data-act="closeSheet" aria-label="Close">&#10005;</button></div><div id="sheetbody"></div></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="importfile" accept="application/json,.json" class="hidden">
+
+<script>
+(function () {
+'use strict';
+
+var VERSION = '1.0.0';
+var KEY = 'mymove.v1';
+
+/* ---------- Program content (adapted from the MOVE! Veteran Workbook, 2023) ---------- */
+var MODULES = [
+ {n:1,t:'Welcome to MOVE!',s:'Find your why and set your target',
+  why:'MOVE! is not a diet. It is a lifestyle program built on three things: behavior, nutrition and physical activity. Committing to at least 6 months gives you the best shot at lasting results.',
+  pts:['Losing just 5% of your weight can lower your risk of heart disease, high blood pressure, type 2 diabetes and some cancers.','Start with a goal of losing 5% to 10% of your current weight.','A safe pace is \u00bd to 2 pounds per week.','Change one or two things at a time, not everything at once.','Make every goal SMART: Specific, Measurable, Action-oriented, Realistic, Time-based.','Keys to success: track every day, weigh in at least weekly, ask for support, and celebrate wins.'],
+  todo:['Write down your reasons for making a change','Set your weight-loss goal','Start logging everything you eat and drink','Start logging your active minutes','Set one healthy-eating and one activity SMART goal'],
+  tools:['goal','smart','why']},
+ {n:2,t:'Tracking What You Do',s:'Tracking effort predicts success',
+  why:'Your Food and Activity Log is the most powerful tool in your kit. Just writing things down changes behavior. Veterans who log and get feedback are more likely to meet their goals.',
+  pts:['Be real: log what you actually ate, not what you planned.','Be accurate: measure portions, read labels, time your activity.','Be complete: include drinks, sauces, butter, bites and tastes.','Log right away. Memory runs low: in the workbook example, one Veteran was off by nearly 1,000 calories in a single day.','Count activity done at moderate effort or harder: you can talk, but not sing.','Can\u2019t write it down? Take a photo of your plate or record a voice note.','Reward yourself (not with food) for meeting goals.'],
+  todo:['Log food every day this week','Log active minutes every day this week','Pick at least 3 non-food rewards','Set this week\u2019s two SMART goals'],
+  tools:['rewards','smart']},
+ {n:3,t:'Tip the Balance',s:'Calories in vs. calories out',
+  why:'Your weight follows your energy balance. Eat fewer calories than you burn and you lose weight. Most people lose about 1 pound a week with a daily deficit of about 500 calories.',
+  pts:['General daily targets: 1,200\u20131,500 calories for women, 1,500\u20131,800 for men. Your MOVE! team can tailor yours.','Cut calories gradually so your body adjusts and you are not too hungry.','You can create the deficit by eating less, moving more, or both.','Liquid calories add up fast. Shrinking a 20 oz sugary drink to 12 oz saves roughly 90\u2013130 calories.','Look for patterns in your log: skipped meals, late-night snacks, eating when not hungry, eating more when out.','As you lose weight your body needs less, so your target may need a re-check later.'],
+  todo:['Confirm your daily calorie target','Find 2 patterns in last week\u2019s log','Make one drink swap','Try one healthy food swap','Set this week\u2019s two SMART goals'],
+  tools:['drink','burn','swaps']},
+ {n:4,t:'Eat Wisely',s:'Build a healthy plate',
+  why:'Before every meal, ask yourself: how healthy is my plate? Eating from all food groups in the right proportions gets you the nutrients you need with fewer calories.',
+  pts:['My Healthy Plate: \u00bd non-starchy vegetables and fruit, \u00bc whole grains or starchy vegetables, \u00bc lean protein, plus a little low-fat dairy and a low- or no-calorie drink.','BE MINDFUL: Buy healthy foods. Eat breakfast. Make a healthy plate. Involve others, sit at the table, slow down. Nourish your body, don\u2019t skip meals. Drink water before meals. Fix food at home. Use a plate for snacks. Limit high-fat, high-sugar foods.','Water is the best drink. Most adults need 9\u201313 cups of fluid a day.','Make at least half your grains whole grains.','It can take up to 20 minutes for your brain to register that you are full. Eat slowly.','All foods can fit. No food is forbidden; it\u2019s about how much and how often.'],
+  todo:['Rate your plate at 3 dinners','Drink a glass of water before each meal','Swap one refined grain for a whole grain','Replace one sugary drink','Set this week\u2019s two SMART goals'],
+  tools:['plate','portions']},
+ {n:5,t:'Get Fit for Life',s:'Start slow, build up, keep moving',
+  why:'Activity helps manage weight and lowers your risk of heart disease, stroke and diabetes. It also improves sleep, mood and stress. Strive for progress, not perfection.',
+  pts:['Aim for 150 minutes a week of moderate activity (or 75 vigorous).','For weight loss, work up to 300 minutes of moderate activity a week (or 150 vigorous).','Do strengthening activities at least 2 days a week.','Spread it out: be active at least 5 days a week. Any amount counts.','Moderate means you can talk but not sing (RPE 4\u20136).','Three kinds of activity: lifestyle (chores, yard work), work (stairs, walking breaks) and programmed exercise (cardio, strength, flexibility, balance).','Warm up and cool down 5\u201310 minutes. Increase how often before how hard.','Slow down or stop if you feel very tired, sick, lightheaded, or your joints hurt.'],
+  todo:['Compare your current activity to the targets','Put activity on your calendar','Try one new activity','Set this week\u2019s two SMART goals'],
+  tools:['hr','rpe']},
+ {n:6,t:'Take Charge of Your Health',s:'Thoughts, feelings and behavior',
+  why:'How you think about a situation shapes how you feel and what you do next. Catching unhelpful thoughts keeps you in the right mindset to keep going.',
+  pts:['Thoughts, feelings and behaviors all influence each other.','Mindfulness means noticing what is going on inside and around you, without judging it.','Common unhelpful thoughts: all-or-nothing, making excuses, filtering, self-labeling, comparing, assuming the worst, overgeneralizing, and \u201cmust\u201d statements.','Rethink in 4 steps: Recognize it, Question it, Ask if it helps, Consider alternatives.','Hunger or habit? If it\u2019s just an urge, distract yourself for 15 minutes.','Body image is more than skin-deep. Focus on what your body can do; not every win shows on the scale.'],
+  todo:['When you eat more than planned, note the situation, feeling and thought','Rethink 2 unhelpful thoughts','Rate your eating triggers','List 3 non-food ways to cope','Set this week\u2019s two SMART goals'],
+  tools:['thought','triggers']},
+ {n:7,t:'Menu Planning, Shopping & Cooking',s:'Plan it, shop it, cook it',
+  why:'Planning meals, shopping smart, reading labels and cooking in healthier ways turns good intentions into regular habits, and can save time and money.',
+  pts:['Aim for 2\u20133 balanced meals and 1\u20132 healthy snacks, about 3\u20134 hours apart.','Eat something soon after you wake up.','Plan meals for the week, then build your shopping list from the plan.','Shop with a list and not on an empty stomach.','Food labels: check serving size and servings per container first. 5% Daily Value or less is low; 20% or more is high.','Bake, broil, grill, roast, steam, or saut\u00e9 with a little oil or cooking spray instead of frying.','Cook to safe temperatures and refrigerate leftovers within 2 hours.'],
+  todo:['Plan 3 days of meals','Shop from a list','Read 3 food labels','Try one healthier cooking method','Set this week\u2019s two SMART goals'],
+  tools:['plan','label','temps']},
+ {n:8,t:'Managing Challenges',s:'Problem-solve and push past plateaus',
+  why:'Everyone runs into roadblocks. People who plan for challenges, and have a fix ready, are more successful at keeping changes going.',
+  pts:['Problem solving in 5 steps: 1) Describe the problem in detail. 2) Brainstorm options. 3) Pick one to try. 4) Make a positive, step-by-step plan. 5) Try it, then see how it worked.','Weight plateaus are normal. As you lose weight your body needs fewer calories.','To move past a plateau: tighten up tracking, measure portions again, check drinks and extras, re-check your calorie target with your team, and change up your activity.','Be patient. Keep doing what works.'],
+  todo:['Solve one problem using the 5 steps','Re-measure portions for 3 days','Change one thing about your activity','Set this week\u2019s two SMART goals'],
+  tools:['problem']},
+ {n:9,t:'Pump Up Your Physical Activity',s:'Cardio, steps, strength and stretch',
+  why:'Now it\u2019s time to build a complete routine: warm-up, cardio, strength, flexibility and cool-down, increasing gradually and safely.',
+  pts:['Every session: warm up, do the activity, cool down.','Engage your core for posture, balance and safer movement.','Build cardio a few minutes at a time.','Steps: find your average, then add a little each week. Try to get at least 250 steps every hour.','Strength: work the major muscle groups at least 2 days a week, at an effort of 7\u20139.','Stretch when muscles are warm. Hold gently; don\u2019t bounce.','Seated and chair exercises count.'],
+  todo:['Find your daily step baseline','Do strength activities twice this week','Stretch after each session','Set this week\u2019s two SMART goals'],
+  tools:['steps','rpe']},
+ {n:10,t:'Conquer Triggers and Cues',s:'Hunger vs. cravings',
+  why:'Sights, smells, places, people, times of day and feelings can all prompt eating when you are not hungry. Spotting them is how you break the chain.',
+  pts:['Hunger builds slowly, many foods will satisfy it, and it stops when you are full.','A craving hits suddenly, wants one specific food, and fades if you wait it out.','Cravings rise and fall like a wave. Ride it out with a 15-minute distraction.','Manage your environment: keep tempting foods out of sight, put healthy foods in front.','Before social events: eat a healthy snack, decide ahead what you\u2019ll have, and keep a no-calorie drink in hand.','Break the chain: change any link between the trigger and the eating.'],
+  todo:['Name your top 3 triggers','Rearrange your kitchen or pantry','Use the craving timer at least once','Set this week\u2019s two SMART goals'],
+  tools:['craving','triggers']},
+ {n:11,t:'Finesse Your Food',s:'Carbs, protein, fats and smart swaps',
+  why:'Knowing what\u2019s in your food helps you make choices that keep you full and satisfied on fewer calories.',
+  pts:['Carbohydrates: choose fiber-rich whole grains, fruit, vegetables and beans. Limit added sugars.','Protein: lean meats, fish, eggs, beans, low-fat dairy and nuts help you feel full.','Fats: favor unsaturated fats (olive or canola oil, nuts, fish). Limit saturated fat.','Fat has about 9 calories per gram vs. 4 for carbs and protein, so small amounts add up.','Healthy swaps save calories without giving up the meal.','Skip fad diets. Be skeptical of fast-loss promises, cutting whole food groups, or pills and powders.'],
+  todo:['Make 3 healthy swaps','Check the fat source in one meal','Set this week\u2019s two SMART goals'],
+  tools:['swaps']},
+ {n:12,t:'Dust Yourself Off',s:'Handling slips',
+  why:'A slip is a short step off your plan, and everyone has them. What matters is how quickly you get back on track.',
+  pts:['Expect slips. They are part of change, not proof of failure.','Know your high-risk situations ahead of time.','Watch for all-or-nothing thinking: \u201cI blew it, why bother.\u201d','A slip only becomes a relapse when you stop getting back on track.','Get back on at the very next meal or the very next walk.','Reach out to your support people or your MOVE! team.'],
+  todo:['Write your slip plan','Name 3 high-risk situations','Pick a support person to call','Set this week\u2019s two SMART goals'],
+  tools:['slip','thought']},
+ {n:13,t:'Dining Out',s:'Restaurants, fast food, takeout and parties',
+  why:'You can eat out and still reach your goals. It comes down to planning ahead and a few simple requests.',
+  pts:['Plan before you go: look at the menu online.','Ask how food is made. Choose grilled, baked, broiled or steamed.','Ask for sauces and dressings on the side.','Swap fries for a side salad or vegetables.','Split a meal, or box up half before you start.','Fast food: smallest size, skip the combo, drink water or an unsweetened drink.','At social events, focus on the people, not the food.','After eating out, log it honestly and get back on plan at the next meal. Don\u2019t skip meals to \u201cmake up\u201d for it.'],
+  todo:['Check a menu before going out','Use 3 dining-out strategies','Log a restaurant meal honestly','Set this week\u2019s two SMART goals'],
+  tools:['dining']},
+ {n:14,t:'Manage Stress and Find Support',s:'Calm the mind, build your team',
+  why:'Stress can drive eating and push activity off the schedule. Managing stress and leaning on support keeps you moving forward.',
+  pts:['Track your stress: how high, what caused it, how you responded.','Sort stressors into ones you can change and ones you can\u2019t.','Mindfulness and slow breathing calm the body. Try a few minutes a day.','Physical activity is one of the best stress relievers.','Build your support team: family, friends, other Veterans and your MOVE! team. Tell them exactly how they can help.'],
+  todo:['Track your stress 3 days this week','Practice the breathing exercise daily','Ask one person for specific support','Set this week\u2019s two SMART goals'],
+  tools:['breathe','stress']},
+ {n:15,t:'Fine Tune Your Physical Activity',s:'Adjust, adapt and stay motivated',
+  why:'Re-check where you are and fine tune your routine, including how to stay active safely with health conditions, pain or medications.',
+  pts:['Adjust with FITT: Frequency, Intensity, Time and Type.','With chronic conditions, activity usually helps. Ask your care team what\u2019s safe for you.','Living with pain: try low-impact options such as water exercise, cycling, chair exercise or tai chi. Start low and go slow.','Some medications (like beta-blockers) keep your heart rate lower. Use the effort scale (RPE) instead of heart rate.','If you take medicine that lowers blood sugar, follow your team\u2019s advice about activity and low blood sugar.','Stay motivated: add variety, get a buddy, sign up for an event, reward yourself.'],
+  todo:['Review your activity against the targets','Adjust one part of FITT','Ask your team about any activity concerns','Set this week\u2019s two SMART goals'],
+  tools:['rpe','hr']},
+ {n:16,t:'Maintain Your Progress',s:'Make it a lifestyle',
+  why:'Keeping weight off uses the same tools that got you here. This is where the habits become who you are.',
+  pts:['Keep tracking, keep weighing in at least weekly, keep moving.','People who maintain weight loss tend to stay very active, often near 300 minutes a week.','Pick a maintenance range and a plan for what you\u2019ll do if you drift above it.','Keep setting SMART goals and keep your support team close.','Review your whole toolkit and keep the tools that work best for you.','Celebrate how far you\u2019ve come.'],
+  todo:['Review your toolkit','Set your maintenance range and action plan','Plan your next 3 months of goals','Celebrate a milestone'],
+  tools:['toolkit','rewards']}
+];
+var MINIS = [
+ {n:'S',t:'Weight and Sleep',s:'Mini-module',
+  why:'Sleep and weight are linked. Short sleep can increase hunger and cravings and sap the energy you need to stay active.',
+  pts:['Most adults need 7 or more hours of sleep a night.','Keep a regular bedtime and wake time, even on weekends.','Make your bedroom dark, quiet and cool.','Limit caffeine later in the day, and alcohol and screens before bed.','Loud snoring, gasping or daytime sleepiness can be signs of sleep apnea. Losing weight can help. Talk with your care team.'],
+  todo:['Set a regular bedtime','Cut screens 30 minutes before bed','Talk to your team about any sleep problems'],tools:[]},
+ {n:'T',t:'Manage Weight and Quit Tobacco',s:'Mini-module',
+  why:'You can do both. The health benefits of quitting far outweigh any small weight change, and MOVE! tools help manage it.',
+  pts:['Some people gain a little weight after quitting. Planning ahead helps.','Use MOVE! tools to manage cravings: distraction, water, healthy snacks and activity.','VA offers counseling and medicines to help you quit. Ask your care team.','VA Quitline: 1-855-QUIT-VET (1-855-784-8838).','SmokefreeVET text program: text VET to 47848.'],
+  todo:['Talk to your care team about quitting','Plan healthy go-to snacks for cravings'],tools:[]},
+ {n:'H',t:'Be Involved in Your Health Care',s:'Mini-module',
+  why:'You are the most important member of your health care team. Being prepared makes every visit count.',
+  pts:['Bring your log and progress to appointments.','Write your questions down before the visit.','Know your numbers, such as blood pressure, A1c and cholesterol.','Ask how your medicines may affect weight, appetite or activity.','Use secure messaging (My HealtheVet) between visits.'],
+  todo:['Write 3 questions for your next visit','Share your log with your MOVE! team'],tools:['care']}
+];
+
+var TOOLS = {
+ goal:'Weight Loss by the Numbers', smart:'SMART Goal Builder', why:'My Reasons to MOVE!', rewards:'My Rewards',
+ drink:'Rethink Your Drink', burn:'Calories Burned in 10 Minutes', swaps:'Healthy Food Swaps', plate:'Rate My Plate',
+ portions:'Size It Up! Portion Guide', hr:'Target Heart Rate', rpe:'Effort Scale (RPE)', thought:'Rethink a Thought',
+ triggers:'My Eating Triggers', plan:'Meal Plan & Shopping List', label:'Food Label Check', temps:'Safe Cooking Temps',
+ problem:'5-Step Problem Solver', steps:'Step Goal Builder', craving:'Craving Timer', slip:'My Slip Plan',
+ dining:'Dining Out Checklist', breathe:'Calm Breathing', stress:'Stress Tracker', toolkit:'My Toolkit Review',
+ care:'Questions for My Care Team', checkin:'Weekly Check-In'
+};
+
+var DRINKS = [['Fruit punch',320,192],['100% apple juice',300,180],['100% orange juice',280,168],['Lemonade',280,168],['Regular lemon-lime soda',247,148],['Regular cola',227,136],['Sweetened iced tea',225,135],['Tonic water',207,124],['Regular ginger ale',207,124],['Sports drink',165,99],['Fitness water',36,18],['Unsweetened iced tea',3,2],['Sparkling water (unsweetened)',0,0],['Water',0,0]];
+var BURN = [['Light','Ballroom dancing','35-50','28-40'],['Light','Sweeping, moderate effort','26-38','21-30'],['Light','Washing dishes','29-42','23-30'],['Light','Tai chi','35-50','28-40'],['Moderate','Walking 2.5 mph','48-73','36-56'],['Moderate','Bicycling under 10 mph','46-66','37-53'],['Moderate','Step aerobics','64-91','51-73'],['Moderate','Mowing the lawn (walking)','64-91','51-73'],['Moderate','Raking leaves','44-63','35-50'],['Moderate','Shoveling snow','61-88','49-70'],['Moderate','Bowling','44-63','35-50'],['Moderate','Golf, walking & pulling clubs','61-88','49-70'],['Moderate','Slow lap swimming','63-90','54-72'],['Vigorous','Jogging, 9-minute mile','149-213','119-170'],['Vigorous','Basketball','75-108','60-86'],['Vigorous','Carrying groceries upstairs','87-125','70-100']];
+var SWAPS = [['Breakfast','1 cup fat-free milk instead of whole milk',63],['Breakfast','Cooking spray instead of 1 pat of butter',34],['Lunch','Tomato, cucumber & onion instead of \u00be oz cheese + 1 oz ham',154],['Lunch','\u00bd cup pineapple instead of 1 oz potato chips',118],['Lunch','\u00bd Tbsp ranch instead of 2 Tbsp ranch',109],['Lunch','Side salad with light vinaigrette instead of medium fries',270],['Dinner','Steamed broccoli instead of broccoli fried in oil',62],['Dinner','Part-skim ricotta instead of whole-milk ricotta (1 cup)',89],['Dinner','Pasta as a \u00bc-cup side instead of a 1-cup entr\u00e9e',138],['Dinner','Cheese pizza slice instead of meat & cheese',60],['Snack','Air-popped popcorn instead of oil-popped (3 cups)',73],['Snack','8 oz sugar-free nonfat yogurt instead of 6 PB crackers',82],['Snack','Sparkling water instead of a 12 oz soda',136],['Snack','A large orange instead of 3 sandwich cookies',54]];
+var REWARDS = ['New workout outfit','New water bottle','A massage','Movie of your choice','New fitness app','New workout song','A \u201cstaycation\u201d','Farmers market trip','Motivational fridge magnet','Learn a new sport','Learn a new skill','Comedy club night','Day trip to a favorite town','Fishing trip','See your favorite band','New running or walking shoes','Local sporting event','Round at your favorite golf course','Charity walk event','Cooking class','Start a garden','Hike in nature','Camping trip','Personal training session','New library book and a lazy afternoon'];
+var BENEFITS = ['Better sleep','Better check-up','Improved memory','Clothes fit better','Less stress','More endurance','More energy','Less pain','Better mood','Healthier cooking','Greater confidence','More organized','Fewer prescription medications','Better blood pressure control','Better blood sugar control'];
+var TRIGGERS = ['When happy','While alone','When bored','When lonely','At social gatherings','When feeling down','When nervous','When frustrated','While working','At the movies','While reading','While drinking alcohol','While watching TV','While smoking','While doing housework','When celebrating','While on vacation','While away from home','While on the phone','At restaurants or dining halls','During regular meals','While preparing meals','After physical activity'];
+var THOUGHTS = [['All or nothing','\u201cI\u2019ve blown the whole day.\u201d','One slip at lunch doesn\u2019t erase the day. I\u2019ll get back on track at dinner.'],['Making excuses','\u201cI can\u2019t stick to my plan because of what others bring home.\u201d','I can have a small portion, or ask for a healthier option.'],['Filtering','\u201cI haven\u2019t stuck to my plan at all.\u201d','I stuck to it 4 of 7 days. That\u2019s progress.'],['Self-labeling','\u201cI\u2019m the world\u2019s worst cook.\u201d','My family liked what I made last night. I\u2019m still learning.'],['Comparing','\u201cMy buddy lost way more than me.\u201d','I won\u2019t quit. I\u2019ll ask him for tips.'],['Assuming the worst','\u201cI\u2019ll get hurt and won\u2019t be able to work out.\u201d','I\u2019ll exercise safely. If I get hurt, I\u2019ll find another way to move.'],['Overgeneralizing','\u201cI\u2019ll never lose weight.\u201d','With steady effort I can. I can be patient.'],['\u201cMust\u201d statements','\u201cI must clean my plate.\u201d','What I don\u2019t eat can be leftovers.']];
+var TIPS = ['Log it as you go. Memory underestimates.','Drink a glass of water before each meal.','Half your plate: non-starchy vegetables and fruit.','Moderate effort = you can talk but not sing.','Any activity beats none. Ten minutes counts.','Weigh in at least once a week, same time of day.','A slip is one meal, not the whole day. Get back on at the next one.','Craving? Set a 15-minute timer and do something else.','Eat slowly. Fullness takes about 20 minutes to register.','Change one or two things at a time.','Take the stairs, park farther away, stand on phone calls.','Reward yourself (not with food) when you hit a goal.','Box up half your restaurant meal before you start.','Keep tempting foods out of sight.','Every pound and every minute counts. Be proud of each win.'];
+
+/* ---------- State ---------- */
+function blank() {
+  return {profile:null,food:{},act:{},water:{},weights:[],goals:{},checkins:[],mods:{},thoughts:[],problems:[],stress:[],slipPlan:{},rewards:[],customRewards:[],triggers:{},plan:{days:{},list:''},toolkit:{},care:'',ui:{tab:'today',logDate:'',logSeg:'food'}};
+}
+var S = load();
+function load() {
+  var d = blank(), o = null, k;
+  try { var raw = localStorage.getItem(KEY); if (raw) { o = JSON.parse(raw); } } catch (e) { o = null; }
+  if (!o || typeof o !== 'object') { return d; }
+  for (k in d) { if (d.hasOwnProperty(k) && !(k in o)) { o[k] = d[k]; } }
+  return o;
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Could not save on this device'); }
+}
+
+/* ---------- Helpers ---------- */
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function parseYmd(s) { var p = String(s).split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function today() { return ymd(new Date()); }
+function addDays(s, n) { var d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); }
+function daysBetween(a, b) { return Math.round((parseYmd(b) - parseYmd(a)) / 86400000); }
+var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function fmtDate(s) { var d = parseYmd(s); return DOW[d.getDay()] + ', ' + MON[d.getMonth()] + ' ' + d.getDate(); }
+function fmtLong(s) { var d = parseYmd(s); return MON[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear(); }
+function nowTime() { var d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function uid() { return new Date().getTime().toString(36) + Math.random().toString(36).slice(2, 7); }
+function num(v) { var n = parseFloat(v); return isNaN(n) ? 0 : n; }
+function r1(n) { return Math.round(n * 10) / 10; }
+function commas(n) { n = Math.round(n); var s = String(Math.abs(n)), out = ''; while (s.length > 3) { out = ',' + s.slice(-3) + out; s = s.slice(0, -3); } return (n < 0 ? '-' : '') + s + out; }
+function pct(a, b) { if (!b) { return 0; } var p = Math.round(a / b * 100); return p < 0 ? 0 : p; }
+function barHtml(v, max) { var p = pct(v, max); var w = p > 100 ? 100 : p; return '<div class="bar"><i style="width:' + w + '%"></i></div>'; }
+function toast(msg) { var t = $('toast'); t.textContent = msg; t.className = 'show'; clearTimeout(toast.h); toast.h = setTimeout(function () { t.className = ''; }, 2200); }
+function val(id) { var el = $(id); return el ? el.value : ''; }
+function checked(id) { var el = $(id); return !!(el && el.checked); }
+
+/* ---------- Program math ---------- */
+function weekNo() { if (!S.profile) { return 1; } var d = daysBetween(S.profile.startDate, today()); return d < 0 ? 1 : Math.floor(d / 7) + 1; }
+function weekStart(w) { return addDays(S.profile.startDate, (w - 1) * 7); }
+function weekDates(w) { var a = [], s = weekStart(w), i; for (i = 0; i < 7; i++) { a.push(addDays(s, i)); } return a; }
+function currentWeight() { var w = S.weights; if (!w.length) { return S.profile ? S.profile.startWeight : 0; } return sortedWeights()[w.length - 1].lb; }
+function sortedWeights() { return S.weights.slice().sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; }); }
+function goalLbs() { var p = S.profile; return Math.round(p.startWeight * p.goalPct / 100); }
+function goalWeight() { return r1(S.profile.startWeight - goalLbs()); }
+function targetDate() { var p = S.profile; return addDays(p.startDate, Math.ceil(goalLbs() / p.rate) * 7); }
+function foodTotal(d) { var a = S.food[d] || [], t = 0, i; for (i = 0; i < a.length; i++) { t += num(a[i].cal); } return t; }
+function actOut(d) { var a = S.act[d] || [], t = 0, i; for (i = 0; i < a.length; i++) { t += num(a[i].kcal); } return t; }
+function weekActivity(w) {
+  var ds = weekDates(w), mod = 0, vig = 0, strength = 0, activeDays = 0, i, j, a, dayMin;
+  for (i = 0; i < ds.length; i++) {
+    a = S.act[ds[i]] || []; dayMin = 0;
+    var hasStr = false;
+    for (j = 0; j < a.length; j++) {
+      var m = num(a[j].min), r = num(a[j].rpe);
+      if (r >= 7) { vig += m; } else if (r >= 4) { mod += m; }
+      if (r >= 4) { dayMin += m; }
+      if (a[j].type === 'Strength') { hasStr = true; }
+    }
+    if (dayMin >= 10) { activeDays++; }
+    if (hasStr) { strength++; }
+  }
+  return {mod: mod, vig: vig, equiv: mod + vig * 2, strength: strength, days: activeDays};
+}
+function loggedDays(n) { var c = 0, i, d = today(); for (i = 0; i < n; i++) { if ((S.food[addDays(d, -i)] || []).length) { c++; } } return c; }
+function streak() { var c = 0, d = today(); if (!(S.food[d] || []).length) { d = addDays(d, -1); } while ((S.food[d] || []).length) { c++; d = addDays(d, -1); } return c; }
+function getGoals(w) { if (!S.goals[w]) { S.goals[w] = {eat: '', act: '', eatDays: {}, actDays: {}}; } return S.goals[w]; }
+function lastWeighDate() { var w = sortedWeights(); return w.length ? w[w.length - 1].date : null; }
+
+/* ---------- Navigation ---------- */
+var ACT = {};
+function setTab(t) {
+  S.ui.tab = t; save();
+  var names = ['today', 'log', 'program', 'progress', 'more'], i;
+  for (i = 0; i < names.length; i++) { $('tab-' + names[i]).className = names[i] === t ? 'on' : ''; }
+  render();
+  window.scrollTo(0, 0);
+}
+function render() {
+  $('topdate').innerHTML = S.profile ? 'Week ' + weekNo() + '<br>' + fmtDate(today()) : fmtDate(today());
+  if (!S.profile) { $('tabs').className = 'hidden'; $('view').innerHTML = viewSetup(true); afterSetup(); return; }
+  $('tabs').className = '';
+  var t = S.ui.tab || 'today', h = '';
+  if (t === 'today') { h = viewToday(); }
+  else if (t === 'log') { h = viewLog(); }
+  else if (t === 'program') { h = viewProgram(); }
+  else if (t === 'progress') { h = viewProgress(); }
+  else { h = viewMore(); }
+  $('view').innerHTML = h;
+  if (t === 'progress') { drawCharts(); }
+}
+
+/* ---------- Setup / My Plan ---------- */
+function viewSetup(first) {
+  var p = S.profile || {name: '', sex: 'M', startWeight: '', heightIn: '', goalPct: 5, rate: 1, cal: 0, importance: 7, confidence: 7, reasons: '', concerns: ''};
+  var h = '';
+  if (first) {
+    h += '<div class="card navy"><h1>Welcome to MyMOVE!</h1><p>Your pocket partner for the VA MOVE! Weight Management Program. MyMOVE! follows the MOVE! Veteran Workbook one week at a time: set SMART goals, log food and activity, learn a module, check in, repeat.</p><p class="muted small">Your information stays on this device. Nothing is sent anywhere.</p></div>';
+    h += '<div class="card gold small"><b>Important:</b> MyMOVE! is an independent companion tool. It is not made, endorsed, or reviewed by the U.S. Department of Veterans Affairs, and it doesn\u2019t replace your MOVE! care team or your doctor. Talk with your care team before changing how you eat or how active you are.</div>';
+  }
+  h += '<form data-form="setup" class="card"><h2>1. About you</h2>';
+  h += '<label for="s_name">First name or call sign</label><input type="text" id="s_name" value="' + esc(p.name) + '" autocomplete="given-name">';
+  h += '<label for="s_sex">Calorie guide for</label><select id="s_sex"><option value="M"' + (p.sex === 'M' ? ' selected' : '') + '>Men (1,500\u20131,800 a day)</option><option value="F"' + (p.sex === 'F' ? ' selected' : '') + '>Women (1,200\u20131,500 a day)</option></select>';
+  h += '<div class="grid2"><div><label for="s_wt">Current weight (lb)</label><input type="number" inputmode="decimal" id="s_wt" min="80" max="700" step="0.1" value="' + esc(p.startWeight) + '" required></div>';
+  h += '<div><label for="s_ht">Height (inches, optional)</label><input type="number" inputmode="decimal" id="s_ht" min="48" max="90" value="' + esc(p.heightIn) + '"></div></div>';
+  h += '<h2 style="margin-top:18px">2. Weight-loss goal</h2><p class="muted">MOVE! recommends starting with 5% to 10% of your current weight. Even 5% improves your health.</p>';
+  h += '<label for="s_pct">Goal</label><select id="s_pct">';
+  var pcts = [5, 7, 8, 10], i;
+  for (i = 0; i < pcts.length; i++) { h += '<option value="' + pcts[i] + '"' + (num(p.goalPct) === pcts[i] ? ' selected' : '') + '>Lose ' + pcts[i] + '% of my weight</option>'; }
+  h += '</select><label for="s_rate">Pace (pounds per week)</label><select id="s_rate">';
+  var rates = [0.5, 1, 1.5, 2];
+  for (i = 0; i < rates.length; i++) { h += '<option value="' + rates[i] + '"' + (num(p.rate) === rates[i] ? ' selected' : '') + '>' + rates[i] + ' lb per week</option>'; }
+  h += '</select><div id="s_calc" class="card gold" style="margin:12px 0 0"></div>';
+  h += '<h2 style="margin-top:18px">3. Daily calorie target</h2><p class="muted">Aim for a deficit of about 500 calories a day, and get there gradually. If your MOVE! team gave you a number, use theirs.</p>';
+  h += '<label for="s_cal">Calories per day</label><input type="number" inputmode="numeric" id="s_cal" min="1200" max="3500" step="50" value="' + esc(p.cal || '') + '" placeholder="e.g. 1650">';
+  h += '<p class="muted small" id="s_calhint"></p>';
+  h += '<h2 style="margin-top:18px">4. Readiness</h2>';
+  h += '<label for="s_imp">How important is managing your weight right now? <span id="s_impv">' + p.importance + '</span>/10</label><input type="range" id="s_imp" min="0" max="10" value="' + p.importance + '">';
+  h += '<label for="s_conf">How confident are you about making changes? <span id="s_confv">' + p.confidence + '</span>/10</label><input type="range" id="s_conf" min="0" max="10" value="' + p.confidence + '">';
+  h += '<label for="s_reasons">My reasons to MOVE! (what matters most to me)</label><textarea id="s_reasons" placeholder="Keep up with my grandkids. Get off blood pressure meds. Hike again.">' + esc(p.reasons) + '</textarea>';
+  h += '<label for="s_concerns">My concerns about starting</label><textarea id="s_concerns" placeholder="Time, cost, knee pain...">' + esc(p.concerns) + '</textarea>';
+  h += '<p class="muted small">More reasons than concerns? You\u2019re ready. More concerns? Bring them to your MOVE! team; they can help.</p>';
+  h += '<button class="btn gold block" type="submit" style="margin-top:12px">' + (first ? 'Start my MOVE!' : 'Save my plan') + '</button></form>';
+  return h;
+}
+function afterSetup() {
+  var ids = ['s_wt', 's_pct', 's_rate', 's_sex', 's_cal', 's_imp', 's_conf'], i;
+  for (i = 0; i < ids.length; i++) { var el = $(ids[i]); if (el) { el.oninput = setupCalc; el.onchange = setupCalc; } }
+  setupCalc();
+}
+function setupCalc() {
+  var box = $('s_calc'); if (!box) { return; }
+  var wt = num(val('s_wt')), pc = num(val('s_pct')), rate = num(val('s_rate')), sex = val('s_sex');
+  $('s_impv').textContent = val('s_imp'); $('s_confv').textContent = val('s_conf');
+  var lo = sex === 'F' ? 1200 : 1500, hi = sex === 'F' ? 1500 : 1800;
+  $('s_calhint').textContent = 'MOVE! general range for ' + (sex === 'F' ? 'women' : 'men') + ': ' + commas(lo) + '\u2013' + commas(hi) + ' calories a day. Leave blank to use ' + commas(hi) + ' to start.';
+  if (!wt) { box.innerHTML = 'Enter your weight to see your numbers.'; return; }
+  var lbs = Math.round(wt * pc / 100), wks = Math.ceil(lbs / rate);
+  var start = S.profile ? S.profile.startDate : today();
+  box.innerHTML = '<b>Your target:</b> lose <b>' + lbs + ' lb</b> (' + pc + '%), from ' + r1(wt) + ' to <b>' + r1(wt - lbs) + ' lb</b>.<br>At ' + rate + ' lb a week that\u2019s about <b>' + wks + ' weeks</b>, around <b>' + fmtLong(addDays(start, wks * 7)) + '</b>.<br><span class="small">5% = ' + Math.round(wt * 0.05) + ' lb \u00b7 8% = ' + Math.round(wt * 0.08) + ' lb \u00b7 10% = ' + Math.round(wt * 0.1) + ' lb</span>';
+}
+function submitSetup() {
+  var wt = num(val('s_wt'));
+  if (wt < 80 || wt > 700) { toast('Please enter your current weight'); return; }
+  var sex = val('s_sex'), cal = Math.round(num(val('s_cal')));
+  if (!cal) { cal = sex === 'F' ? 1500 : 1800; }
+  if (cal < 1200) { cal = 1200; toast('Set to 1,200, the lowest the program uses'); }
+  var first = !S.profile;
+  var p = S.profile || {startDate: today()};
+  p.name = val('s_name').replace(/^\s+|\s+$/g, ''); p.sex = sex; p.heightIn = num(val('s_ht')) || '';
+  p.goalPct = num(val('s_pct')); p.rate = num(val('s_rate')); p.cal = cal;
+  p.importance = num(val('s_imp')); p.confidence = num(val('s_conf'));
+  p.reasons = val('s_reasons'); p.concerns = val('s_concerns');
+  if (first) { p.startWeight = wt; S.weights.push({date: today(), lb: wt}); }
+  else { p.startWeight = wt; }
+  S.profile = p; save();
+  closeSheet(true);
+  toast(first ? 'Your plan is set. Let\u2019s MOVE!' : 'Plan saved');
+  if (first) { S.ui.tab = 'today'; setTab('today'); openModule(1); } else { render(); }
+}
+
+/* ---------- Today ---------- */
+function viewToday() {
+  var p = S.profile, t = today(), w = weekNo(), m = w > 16 ? 16 : w, md = MODULES[m - 1];
+  var eaten = foodTotal(t), out = actOut(t), wa = weekActivity(w), water = S.water[t] || 0;
+  var g = getGoals(w), h = '';
+  h += '<h1>' + (p.name ? 'Hello, ' + esc(p.name) + '.' : 'Hello.') + '</h1>';
+  h += '<div class="card navy" data-act="module" data-v="' + m + '" style="cursor:pointer"><div class="row between"><span class="pill gold">Week ' + w + (w > 16 ? ' \u00b7 Maintenance' : '') + '</span><span class="muted small">' + (S.mods[m] && S.mods[m].done ? 'Done \u2713' : 'Tap to open') + '</span></div><h2 style="margin-top:8px">Module ' + m + ': ' + esc(md.t) + '</h2><p class="muted" style="margin:0">' + esc(md.s) + '</p></div>';
+  h += '<div class="quick" style="margin-bottom:14px"><button class="btn" data-act="addFood"><span>+</span>Food</button><button class="btn" data-act="addAct"><span>+</span>Activity</button><button class="btn" data-act="water" data-v="1"><span>+</span>Water</button><button class="btn" data-act="addWeight"><span>+</span>Weight</button></div>';
+  var left = p.cal - eaten + out;
+  h += '<div class="card"><div class="row between"><h2 style="margin:0">Calories today</h2><span class="pill">' + commas(p.cal) + ' target</span></div>';
+  h += barHtml(eaten - out, p.cal);
+  h += '<div class="grid3" style="margin-top:8px"><div class="stat"><b>' + commas(eaten) + '</b><span>eaten</span></div><div class="stat"><b>' + commas(out) + '</b><span>burned</span></div><div class="stat"><b>' + commas(left) + '</b><span>' + (left >= 0 ? 'left' : 'over') + '</span></div></div>';
+  if (!eaten) { h += '<p class="muted small" style="margin:10px 0 0">Nothing logged yet today. Be real, accurate and complete.</p>'; }
+  h += '</div>';
+  var actTarget = w >= 9 ? 300 : 150;
+  h += '<div class="card"><div class="row between"><h2 style="margin:0">Activity this week</h2><span class="pill">' + actTarget + ' min goal</span></div>';
+  h += barHtml(wa.equiv, actTarget);
+  h += '<p class="small" style="margin:4px 0 0"><b>' + wa.equiv + '</b> moderate-equivalent minutes \u00b7 active <b>' + wa.days + '</b>/5 days \u00b7 strength <b>' + wa.strength + '</b>/2 days</p><p class="muted small" style="margin:4px 0 0">Vigorous minutes count double. Only effort of 4+ on the RPE scale counts.</p></div>';
+  h += '<div class="card"><div class="row between"><h2 style="margin:0">Water</h2><span class="pill">' + water + ' / 9+ cups</span></div>' + barHtml(water, 9);
+  h += '<div class="row" style="margin-top:8px"><button class="btn ghost sm" data-act="water" data-v="-1">\u2212 1 cup</button><button class="btn sm" data-act="water" data-v="1">+ 1 cup</button></div></div>';
+  h += '<div class="card"><div class="row between"><h2 style="margin:0">This week\u2019s SMART goals</h2><button class="btn ghost sm" data-act="tool" data-v="smart">' + (g.eat || g.act ? 'Edit' : 'Set') + '</button></div>';
+  h += goalRow('eat', 'Healthy eating', g, w) + goalRow('act', 'Physical activity', g, w) + '</div>';
+  var lw = lastWeighDate();
+  if (!lw || daysBetween(lw, t) >= 7) {
+    h += '<div class="card gold"><b>Time to weigh in.</b> ' + (lw ? 'Last weigh-in was ' + daysBetween(lw, t) + ' days ago.' : '') + ' MOVE! recommends weighing in at least weekly.<div style="margin-top:8px"><button class="btn sm" data-act="addWeight">Log weight</button></div></div>';
+  }
+  var dow = daysBetween(p.startDate, t) % 7;
+  if (dow === 6 || dow === 0 && w > 1) {
+    h += '<div class="card"><b>Weekly check-in</b><p class="muted small" style="margin:4px 0 8px">Reflect on last week and set new goals, just like the start of every MOVE! session.</p><button class="btn gold sm" data-act="tool" data-v="checkin">Start check-in</button></div>';
+  }
+  if (p.reasons) { h += '<div class="card"><h3 style="margin-top:0">My reasons to MOVE!</h3><p class="tip" style="margin:0">' + esc(p.reasons).replace(/\n/g, '<br>') + '</p></div>'; }
+  var tip = TIPS[(daysBetween('2026-01-01', t) % TIPS.length + TIPS.length) % TIPS.length];
+  h += '<div class="card"><h3 style="margin-top:0">Tip of the day</h3><p class="tip" style="margin:0">' + esc(tip) + '</p></div>';
+  h += '<div class="row" style="margin-bottom:14px"><button class="btn ghost grow" data-act="tool" data-v="craving">Having a craving?</button><button class="btn ghost grow" data-act="tool" data-v="breathe">Feeling stressed?</button></div>';
+  return h;
+}
+function goalRow(kind, label, g, w) {
+  var txt = g[kind], days = kind === 'eat' ? g.eatDays : g.actDays, ds = weekDates(w), t = today(), h = '<div class="goalrow"><div class="muted small">' + label + '</div>';
+  if (!txt) { return h + '<div class="muted">Not set yet.</div></div>'; }
+  var c = 0, i;
+  for (i = 0; i < ds.length; i++) { if (days[ds[i]]) { c++; } }
+  h += '<div><b>' + esc(txt) + '</b></div><div class="dots">';
+  for (i = 0; i < ds.length; i++) {
+    var future = ds[i] > t;
+    h += '<button aria-label="' + fmtDate(ds[i]) + '" class="' + (days[ds[i]] ? 'on ' : '') + (ds[i] === t ? 'today' : '') + '"' + (future ? ' disabled style="opacity:.35"' : '') + ' data-act="goalDay" data-v="' + kind + '|' + ds[i] + '">' + DOW[parseYmd(ds[i]).getDay()].charAt(0) + '</button>';
+  }
+  return h + '</div><div class="muted small" style="margin-top:4px">On track ' + c + ' of 7 days. Tap a day when you hit it.</div></div>';
+}
+
+/* ---------- Log ---------- */
+function viewLog() {
+  var d = S.ui.logDate || today(), seg = S.ui.logSeg || 'food', h = '';
+  h += '<div class="datebar"><button data-act="logDay" data-v="-1" aria-label="Previous day">\u2039</button><div style="text-align:center"><b>' + (d === today() ? 'Today' : fmtDate(d)) + '</b><div class="muted small">' + fmtLong(d) + '</div></div><button data-act="logDay" data-v="1" aria-label="Next day"' + (d >= today() ? ' disabled style="opacity:.35"' : '') + '>\u203a</button></div>';
+  h += '<div class="seg"><button class="' + (seg === 'food' ? 'on' : '') + '" data-act="logSeg" data-v="food">Food</button><button class="' + (seg === 'act' ? 'on' : '') + '" data-act="logSeg" data-v="act">Activity</button><button class="' + (seg === 'body' ? 'on' : '') + '" data-act="logSeg" data-v="body">Water & Weight</button></div>';
+  if (seg === 'food') {
+    var f = (S.food[d] || []).slice().sort(function (a, b) { return a.time < b.time ? -1 : 1; }), tot = foodTotal(d), i;
+    h += '<div class="card"><div class="row between"><h2 style="margin:0">Food & drink</h2><span class="pill">' + commas(tot) + ' / ' + commas(S.profile.cal) + ' cal</span></div>' + barHtml(tot, S.profile.cal);
+    if (!f.length) { h += '<p class="muted">Nothing logged. Include everything: drinks, butter, sauces, bites and tastes.</p>'; }
+    h += '<div class="list">';
+    for (i = 0; i < f.length; i++) {
+      h += '<div class="item"><div class="grow"><b>' + esc(f[i].item) + '</b>' + (f[i].amt ? ' <span class="muted">\u00b7 ' + esc(f[i].amt) + '</span>' : '') + '<div class="muted small">' + esc(f[i].time) + ' \u00b7 ' + esc(f[i].meal) + (f[i].mood ? ' \u00b7 felt ' + esc(f[i].mood) : '') + '</div></div><b>' + (f[i].cal !== '' ? commas(num(f[i].cal)) : '\u2014') + '</b><button class="x" data-act="delFood" data-v="' + f[i].id + '" aria-label="Delete">\u2715</button></div>';
+    }
+    h += '</div><button class="btn block" style="margin-top:10px" data-act="addFood">+ Add food or drink</button></div>';
+    h += '<div class="card"><h3 style="margin-top:0">Healthy plate check</h3><p class="muted small" style="margin:0 0 8px">Half non-starchy veg and fruit, a quarter whole grains or starch, a quarter lean protein.</p><button class="btn ghost sm" data-act="tool" data-v="plate">Rate my plate</button></div>';
+  } else if (seg === 'act') {
+    var a = S.act[d] || [], tm = 0, j;
+    for (j = 0; j < a.length; j++) { tm += num(a[j].min); }
+    h += '<div class="card"><div class="row between"><h2 style="margin:0">Activity</h2><span class="pill">' + tm + ' min</span></div>';
+    if (!a.length) { h += '<p class="muted">No activity logged. Chores, yard work, stairs and walks all count.</p>'; }
+    h += '<div class="list">';
+    for (j = 0; j < a.length; j++) {
+      h += '<div class="item"><div class="grow"><b>' + esc(a[j].name) + '</b><div class="muted small">' + esc(a[j].type) + ' \u00b7 effort ' + esc(a[j].rpe) + '/10' + (a[j].kcal ? ' \u00b7 ' + commas(num(a[j].kcal)) + ' cal' : '') + '</div></div><b>' + num(a[j].min) + ' min</b><button class="x" data-act="delAct" data-v="' + a[j].id + '" aria-label="Delete">\u2715</button></div>';
+    }
+    h += '</div><button class="btn block" style="margin-top:10px" data-act="addAct">+ Add activity</button></div>';
+    h += '<div class="card"><button class="btn ghost sm" data-act="tool" data-v="rpe">Effort scale (RPE)</button> <button class="btn ghost sm" data-act="tool" data-v="burn">Calories burned guide</button></div>';
+  } else {
+    var wtr = S.water[d] || 0;
+    h += '<div class="card"><div class="row between"><h2 style="margin:0">Water</h2><span class="pill">' + wtr + ' cups</span></div>' + barHtml(wtr, 9);
+    h += '<div class="row" style="margin-top:8px"><button class="btn ghost" data-act="waterDay" data-v="-1">\u2212 1 cup</button><button class="btn" data-act="waterDay" data-v="1">+ 1 cup</button></div><p class="muted small" style="margin:8px 0 0">Most adults need 9\u201313 cups of fluid a day. More in heat or when active.</p></div>';
+    var ws = sortedWeights(), k, onDay = null;
+    for (k = 0; k < ws.length; k++) { if (ws[k].date === d) { onDay = ws[k]; } }
+    h += '<div class="card"><h2>Weight</h2>' + (onDay ? '<p>Logged: <b>' + onDay.lb + ' lb</b></p>' : '<p class="muted">No weigh-in on this day.</p>') + '<button class="btn" data-act="addWeight">' + (onDay ? 'Update weight' : 'Log weight') + '</button></div>';
+  }
+  return h;
+}
+function recentFoods() {
+  var seen = {}, out = [], d = today(), i, j, a;
+  for (i = 0; i < 21 && out.length < 12; i++) {
+    a = S.food[addDays(d, -i)] || [];
+    for (j = a.length - 1; j >= 0 && out.length < 12; j--) {
+      var key = (a[j].item + '|' + a[j].amt).toLowerCase();
+      if (!seen[key]) { seen[key] = 1; out.push(a[j]); }
+    }
+  }
+  return out;
+}
+function mealGuess() { var hr = new Date().getHours(); if (hr < 10) { return 'Breakfast'; } if (hr < 11) { return 'Snack'; } if (hr < 14) { return 'Lunch'; } if (hr < 17) { return 'Snack'; } if (hr < 21) { return 'Dinner'; } return 'Snack'; }
+ACT.addFood = function () {
+  var d = S.ui.tab === 'log' ? (S.ui.logDate || today()) : today();
+  var meals = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Drink'], moods = ['', 'Hungry', 'Happy', 'Tired', 'Bored', 'Stressed', 'Sad', 'Lonely', 'Celebrating', 'Social'], i;
+  var h = '<form data-form="food" data-v="' + d + '"><p class="muted">Logging for <b>' + fmtDate(d) + '</b></p>';
+  var rec = recentFoods();
+  if (rec.length) {
+    h += '<label>Quick add a recent item</label><div class="chips">';
+    for (i = 0; i < rec.length; i++) { h += '<button type="button" data-act="fillFood" data-v="' + esc(JSON.stringify({item: rec[i].item, amt: rec[i].amt, cal: rec[i].cal})) + '">' + esc(rec[i].item) + (rec[i].cal !== '' ? ' \u00b7 ' + esc(rec[i].cal) : '') + '</button>'; }
+    h += '</div>';
+  }
+  h += '<label for="f_item">What did you eat or drink?</label><input type="text" id="f_item" required placeholder="e.g. Grilled chicken breast" autocomplete="off">';
+  h += '<div class="grid2"><div><label for="f_amt">Amount</label><input type="text" id="f_amt" placeholder="e.g. 3 oz, 1 cup"></div><div><label for="f_cal">Calories</label><input type="number" inputmode="numeric" id="f_cal" min="0" max="5000" placeholder="from label"></div></div>';
+  h += '<div class="grid2"><div><label for="f_meal">Meal</label><select id="f_meal">';
+  var mg = mealGuess();
+  for (i = 0; i < meals.length; i++) { h += '<option' + (meals[i] === mg ? ' selected' : '') + '>' + meals[i] + '</option>'; }
+  h += '</select></div><div><label for="f_time">Time</label><input type="time" id="f_time" value="' + nowTime() + '"></div></div>';
+  h += '<label for="f_mood">Mood or feeling (optional)</label><select id="f_mood">';
+  for (i = 0; i < moods.length; i++) { h += '<option value="' + moods[i] + '">' + (moods[i] || '\u2014') + '</option>'; }
+  h += '</select><p class="muted small">Write how it was made (baked, fried) and the type (whole or fat-free milk). Don\u2019t know calories yet? Log it anyway and fill in later.</p>';
+  h += '<button class="btn gold block" type="submit">Save</button></form>';
+  openSheet('Add food or drink', h);
+  setTimeout(function () { var el = $('f_item'); if (el) { el.focus(); } }, 50);
+};
+ACT.fillFood = function (v) { var o; try { o = JSON.parse(v); } catch (e) { return; } $('f_item').value = o.item; $('f_amt').value = o.amt || ''; $('f_cal').value = o.cal; };
+function submitFood(d) {
+  var item = val('f_item').replace(/^\s+|\s+$/g, ''); if (!item) { toast('Enter what you ate'); return; }
+  var c = val('f_cal');
+  if (!S.food[d]) { S.food[d] = []; }
+  S.food[d].push({id: uid(), item: item, amt: val('f_amt'), cal: c === '' ? '' : Math.round(num(c)), meal: val('f_meal'), time: val('f_time') || nowTime(), mood: val('f_mood')});
+  save(); closeSheet(true); toast('Logged'); 
+}
+ACT.delFood = function (id) { var d = S.ui.logDate || today(), a = S.food[d] || [], i; for (i = 0; i < a.length; i++) { if (a[i].id === id) { a.splice(i, 1); break; } } save(); render(); };
+ACT.addAct = function () {
+  var d = S.ui.tab === 'log' ? (S.ui.logDate || today()) : today(), types = ['Cardio', 'Strength', 'Flexibility', 'Balance', 'Lifestyle', 'Work activity'], i;
+  var picks = ['Walking', 'Chair exercises', 'Yard work', 'Stationary bike', 'Swimming', 'Resistance bands', 'Stretching', 'Tai chi', 'Housework', 'Golf (walking)'];
+  var h = '<form data-form="act" data-v="' + d + '"><p class="muted">Logging for <b>' + fmtDate(d) + '</b></p><label>Quick pick</label><div class="chips">';
+  for (i = 0; i < picks.length; i++) { h += '<button type="button" data-act="fillAct" data-v="' + esc(picks[i]) + '">' + esc(picks[i]) + '</button>'; }
+  h += '</div><label for="a_name">Activity</label><input type="text" id="a_name" required placeholder="e.g. Brisk walk with the dog">';
+  h += '<div class="grid2"><div><label for="a_min">Minutes</label><input type="number" inputmode="numeric" id="a_min" min="1" max="600" required></div><div><label for="a_type">Type</label><select id="a_type">';
+  for (i = 0; i < types.length; i++) { h += '<option>' + types[i] + '</option>'; }
+  h += '</select></div></div><label for="a_rpe">Effort (RPE): <span id="a_rpev">5</span>/10 \u2014 <span id="a_rpet">Moderate</span></label><input type="range" id="a_rpe" min="1" max="10" value="5">';
+  h += '<p class="muted small">4\u20136 moderate (can talk, not sing) \u00b7 7\u20138 vigorous (a sentence at a time) \u00b7 9\u201310 very hard</p>';
+  h += '<label for="a_kcal">Calories burned (optional)</label><input type="number" inputmode="numeric" id="a_kcal" min="0" max="3000" placeholder="from your tracker or the guide">';
+  h += '<button class="btn gold block" type="submit" style="margin-top:12px">Save</button></form>';
+  openSheet('Add activity', h);
+  $('a_rpe').oninput = function () { var v = num(this.value); $('a_rpev').textContent = v; $('a_rpet').textContent = rpeName(v); };
+};
+function rpeName(v) { if (v <= 1) { return 'Very light'; } if (v <= 3) { return 'Light'; } if (v <= 6) { return 'Moderate'; } if (v <= 8) { return 'Vigorous'; } if (v === 9) { return 'Very hard'; } return 'Max effort'; }
+ACT.fillAct = function (v) {
+  $('a_name').value = v;
+  var map = {'Resistance bands': 'Strength', 'Stretching': 'Flexibility', 'Tai chi': 'Balance', 'Housework': 'Lifestyle', 'Yard work': 'Lifestyle'};
+  $('a_type').value = map[v] || 'Cardio';
+};
+function submitAct(d) {
+  var name = val('a_name').replace(/^\s+|\s+$/g, ''), m = Math.round(num(val('a_min')));
+  if (!name || m <= 0) { toast('Enter activity and minutes'); return; }
+  if (!S.act[d]) { S.act[d] = []; }
+  S.act[d].push({id: uid(), name: name, min: m, type: val('a_type'), rpe: num(val('a_rpe')), kcal: val('a_kcal') === '' ? '' : Math.round(num(val('a_kcal')))});
+  save(); closeSheet(true); toast('Activity logged');
+}
+ACT.delAct = function (id) { var d = S.ui.logDate || today(), a = S.act[d] || [], i; for (i = 0; i < a.length; i++) { if (a[i].id === id) { a.splice(i, 1); break; } } save(); render(); };
+ACT.water = function (v) { var t = today(); S.water[t] = Math.max(0, (S.water[t] || 0) + num(v)); save(); render(); if (num(v) > 0) { toast(S.water[t] + ' cups today'); } };
+ACT.waterDay = function (v) { var d = S.ui.logDate || today(); S.water[d] = Math.max(0, (S.water[d] || 0) + num(v)); save(); render(); };
+ACT.addWeight = function () {
+  var d = S.ui.tab === 'log' ? (S.ui.logDate || today()) : today();
+  var h = '<form data-form="weight"><label for="w_date">Date</label><input type="date" id="w_date" value="' + d + '" max="' + today() + '"><label for="w_lb">Weight (lb)</label><input type="number" inputmode="decimal" id="w_lb" step="0.1" min="80" max="700" value="' + currentWeight() + '" required>';
+  h += '<p class="muted small">Weigh at the same time of day, ideally in the morning before eating. Day-to-day ups and downs are normal; watch the weekly trend.</p><button class="btn gold block" type="submit">Save weight</button></form>';
+  openSheet('Log weight', h);
+};
+function submitWeight() {
+  var d = val('w_date') || today(), lb = r1(num(val('w_lb')));
+  if (lb < 80 || lb > 700) { toast('Enter a valid weight'); return; }
+  var i, found = false;
+  for (i = 0; i < S.weights.length; i++) { if (S.weights[i].date === d) { S.weights[i].lb = lb; found = true; } }
+  if (!found) { S.weights.push({date: d, lb: lb}); }
+  save(); closeSheet(true);
+  var lost = r1(S.profile.startWeight - lb), p5 = Math.round(S.profile.startWeight * 0.05);
+  toast(lost > 0 ? (lost >= p5 ? '5% milestone reached! ' : '') + 'Down ' + lost + ' lb since you started' : 'Weight logged. Keep going.');
+}
+ACT.logDay = function (v) { var d = addDays(S.ui.logDate || today(), num(v)); if (d > today()) { return; } S.ui.logDate = d; save(); render(); };
+ACT.logSeg = function (v) { S.ui.logSeg = v; save(); render(); };
+ACT.goalDay = function (v) { var p = v.split('|'), g = getGoals(weekNo()), key = p[0] === 'eat' ? 'eatDays' : 'actDays'; if (g[key][p[1]]) { delete g[key][p[1]]; } else { g[key][p[1]] = true; toast('Nice work. That counts.'); } save(); render(); };
+
+/* ---------- Program ---------- */
+function viewProgram() {
+  var w = weekNo(), done = 0, i, h = '';
+  for (i = 1; i <= 16; i++) { if (S.mods[i] && S.mods[i].done) { done++; } }
+  h += '<h1>The MOVE! Program</h1><div class="card"><div class="row between"><b>' + done + ' of 16 modules complete</b><span class="pill">Week ' + w + '</span></div>' + barHtml(done, 16) + '<p class="muted small" style="margin:6px 0 0">MyMOVE! suggests one module a week, the same order as the Veteran Workbook. If your MOVE! group is on a different module, just open that one.</p></div>';
+  h += '<div class="card">';
+  for (i = 0; i < MODULES.length; i++) { h += modRow(MODULES[i], w); }
+  h += '</div><h2>Mini-modules</h2><div class="card">';
+  for (i = 0; i < MINIS.length; i++) { h += modRow(MINIS[i], w); }
+  h += '</div><h2>Toolbox</h2><div class="card"><div class="chips">';
+  var k;
+  for (k in TOOLS) { if (TOOLS.hasOwnProperty(k)) { h += '<button data-act="tool" data-v="' + k + '">' + esc(TOOLS[k]) + '</button>'; } }
+  h += '</div></div>';
+  return h;
+}
+function modRow(md, w) {
+  var st = S.mods[md.n] || {}, cls = 'mod' + (st.done ? ' done' : (md.n === (w > 16 ? 16 : w) ? ' now' : ''));
+  var todo = st.todo || {}, c = 0, i;
+  for (i = 0; i < md.todo.length; i++) { if (todo[i]) { c++; } }
+  return '<div class="' + cls + '" data-act="module" data-v="' + md.n + '"><div class="num">' + (st.done ? '\u2713' : md.n) + '</div><div class="grow"><div class="t">' + esc(md.t) + '</div><div class="s">' + esc(md.s) + ' \u00b7 ' + c + '/' + md.todo.length + ' to-dos</div></div><div class="muted">\u203a</div></div>';
+}
+function findMod(n) { var i, all = MODULES.concat(MINIS); for (i = 0; i < all.length; i++) { if (String(all[i].n) === String(n)) { return all[i]; } } return null; }
+function openModule(n) {
+  var md = findMod(n); if (!md) { return; }
+  var st = S.mods[md.n] || {todo: {}}, i, h = '';
+  h += '<div class="card navy"><p style="margin:0">' + esc(md.why) + '</p></div>';
+  h += '<div class="card"><h2>Key points</h2><ul class="pts">';
+  for (i = 0; i < md.pts.length; i++) { h += '<li>' + esc(md.pts[i]) + '</li>'; }
+  h += '</ul></div>';
+  h += '<div class="card"><h2>Bring it home this week</h2>';
+  for (i = 0; i < md.todo.length; i++) { h += '<label class="check"><input type="checkbox" data-act="modTodo" data-v="' + md.n + '|' + i + '"' + (st.todo && st.todo[i] ? ' checked' : '') + '> <span>' + esc(md.todo[i]) + '</span></label>'; }
+  h += '</div>';
+  if (md.tools.length) {
+    h += '<div class="card"><h2>Tools for this module</h2>';
+    for (i = 0; i < md.tools.length; i++) { h += '<button class="btn ghost block" style="margin-bottom:8px;text-align:left" data-act="tool" data-v="' + md.tools[i] + '">' + esc(TOOLS[md.tools[i]]) + ' \u203a</button>'; }
+    h += '</div>';
+  }
+  h += '<button class="btn ' + (st.done ? 'ghost' : 'gold') + ' block" data-act="modDone" data-v="' + md.n + '">' + (st.done ? 'Mark as not complete' : 'Mark module complete') + '</button>';
+  h += '<p class="foot">Want the full lesson? Use your printed MOVE! Veteran Workbook or the PDF on move.va.gov.</p>';
+  openSheet((typeof md.n === 'number' ? 'Module ' + md.n + ': ' : '') + md.t, h);
+}
+ACT.module = function (v) { openModule(v); };
+ACT.modTodo = function (v, el) { var p = v.split('|'); if (!S.mods[p[0]]) { S.mods[p[0]] = {todo: {}}; } if (!S.mods[p[0]].todo) { S.mods[p[0]].todo = {}; } S.mods[p[0]].todo[p[1]] = el.checked; save(); };
+ACT.modDone = function (v) { if (!S.mods[v]) { S.mods[v] = {todo: {}}; } S.mods[v].done = !S.mods[v].done; save(); toast(S.mods[v].done ? 'Module complete. Well done!' : 'Marked not complete'); openModule(v); };
+
+/* ---------- Progress ---------- */
+function viewProgress() {
+  var p = S.profile, cw = currentWeight(), lost = r1(p.startWeight - cw), lostPct = r1(lost / p.startWeight * 100), gl = goalLbs(), h = '';
+  h += '<h1>Progress</h1>';
+  h += '<div class="card"><div class="grid3"><div class="stat"><b>' + r1(p.startWeight) + '</b><span>start (lb)</span></div><div class="stat"><b>' + r1(cw) + '</b><span>now (lb)</span></div><div class="stat"><b>' + goalWeight() + '</b><span>goal (lb)</span></div></div>';
+  h += '<p style="margin:12px 0 2px"><b>' + (lost > 0 ? lost + ' lb lost (' + lostPct + '%)' : 'Let\u2019s get the first pound') + '</b> of your ' + gl + ' lb goal</p>' + barHtml(lost, gl);
+  var m5 = Math.round(p.startWeight * 0.05), m10 = Math.round(p.startWeight * 0.1);
+  h += '<div class="row wrap" style="margin-top:6px"><span class="pill' + (lost >= m5 ? ' green' : '') + '">5% = ' + m5 + ' lb ' + (lost >= m5 ? '\u2713' : '') + '</span><span class="pill' + (lost >= Math.round(p.startWeight * 0.08) ? ' green' : '') + '">8% = ' + Math.round(p.startWeight * 0.08) + ' lb</span><span class="pill' + (lost >= m10 ? ' green' : '') + '">10% = ' + m10 + ' lb</span></div>';
+  h += '<p class="muted small" style="margin:8px 0 0">On pace for about ' + fmtLong(targetDate()) + ' at ' + p.rate + ' lb a week.</p></div>';
+  h += '<div class="card"><h2>Weight trend</h2>' + (S.weights.length < 2 ? '<p class="muted">Log at least two weigh-ins to see your trend.</p>' : '<canvas id="wchart" aria-label="Weight chart"></canvas><p class="muted small" style="margin:6px 0 0">Gold line: your goal weight.</p>') + '</div>';
+  h += '<div class="card"><h2>Active minutes by week</h2><canvas id="achart" aria-label="Activity chart"></canvas><p class="muted small" style="margin:6px 0 0">Moderate-equivalent minutes. Lines at 150 and 300.</p></div>';
+  var lg = loggedDays(7);
+  h += '<div class="card"><h2>Habits</h2><div class="grid3"><div class="stat"><b>' + streak() + '</b><span>day log streak</span></div><div class="stat"><b>' + lg + '/7</b><span>days logged</span></div><div class="stat"><b>' + S.checkins.length + '</b><span>check-ins</span></div></div></div>';
+  if (S.rewards.length || S.customRewards.length) {
+    h += '<div class="card"><h2>My rewards</h2><ul class="pts">';
+    var all = S.rewards.concat(S.customRewards), i;
+    for (i = 0; i < all.length; i++) { h += '<li>' + esc(all[i]) + '</li>'; }
+    h += '</ul><p class="muted small" style="margin:0">Use small rewards for weekly goals and bigger ones for 5%, 8% and 10%.</p></div>';
+  }
+  if (S.checkins.length) {
+    h += '<div class="card"><h2>Check-in history</h2><div class="list">';
+    var c = S.checkins.slice().reverse(), j;
+    for (j = 0; j < c.length && j < 8; j++) { h += '<div class="item"><div class="grow"><b>Week ' + c[j].week + '</b><div class="muted small">' + fmtLong(c[j].date) + ' \u00b7 eating goal: ' + esc(c[j].eatMet) + ' \u00b7 activity goal: ' + esc(c[j].actMet) + '</div>' + (c[j].wins ? '<div class="small">Win: ' + esc(c[j].wins) + '</div>' : '') + '</div><b>' + (c[j].lb ? c[j].lb + ' lb' : '') + '</b></div>'; }
+    h += '</div></div>';
+  }
+  return h;
+}
+function setupCanvas(id) {
+  var c = $(id); if (!c) { return null; }
+  var dpr = window.devicePixelRatio || 1, w = c.clientWidth || 320, h = 220;
+  c.width = w * dpr; c.height = h * dpr;
+  var x = c.getContext('2d'); x.scale(dpr, dpr);
+  x.font = '12px -apple-system,Segoe UI,Roboto,Arial,sans-serif';
+  return {x: x, w: w, h: h};
+}
+function drawCharts() {
+  var ws = sortedWeights(), cv, i;
+  if (ws.length >= 2 && (cv = setupCanvas('wchart'))) {
+    var x = cv.x, W = cv.w, H = cv.h, L = 44, R = 10, T = 12, B = 26, gw = goalWeight();
+    var lo = gw, hi = S.profile.startWeight;
+    for (i = 0; i < ws.length; i++) { lo = Math.min(lo, ws[i].lb); hi = Math.max(hi, ws[i].lb); }
+    lo = Math.floor(lo - 2); hi = Math.ceil(hi + 2);
+    var t0 = parseYmd(ws[0].date).getTime(), t1 = parseYmd(ws[ws.length - 1].date).getTime(); if (t1 === t0) { t1 = t0 + 86400000; }
+    var X = function (d) { return L + (parseYmd(d).getTime() - t0) / (t1 - t0) * (W - L - R); };
+    var Y = function (v) { return T + (hi - v) / (hi - lo) * (H - T - B); };
+    x.strokeStyle = '#e4ebf5'; x.fillStyle = '#5b6778'; x.lineWidth = 1;
+    for (i = 0; i <= 4; i++) { var v = lo + (hi - lo) * i / 4, yy = Y(v); x.beginPath(); x.moveTo(L, yy); x.lineTo(W - R, yy); x.stroke(); x.fillText(String(Math.round(v)), 4, yy + 4); }
+    x.fillText(fmtDate(ws[0].date).slice(5), L, H - 6); var lastLbl = fmtDate(ws[ws.length - 1].date).slice(5); x.fillText(lastLbl, W - R - x.measureText(lastLbl).width, H - 6);
+    x.strokeStyle = '#f2b632'; x.lineWidth = 2; x.setLineDash([6, 4]); x.beginPath(); x.moveTo(L, Y(gw)); x.lineTo(W - R, Y(gw)); x.stroke(); x.setLineDash([]);
+    x.strokeStyle = '#1d4f91'; x.lineWidth = 3; x.beginPath();
+    for (i = 0; i < ws.length; i++) { if (i === 0) { x.moveTo(X(ws[i].date), Y(ws[i].lb)); } else { x.lineTo(X(ws[i].date), Y(ws[i].lb)); } }
+    x.stroke(); x.fillStyle = '#12284c';
+    for (i = 0; i < ws.length; i++) { x.beginPath(); x.arc(X(ws[i].date), Y(ws[i].lb), 4, 0, Math.PI * 2); x.fill(); }
+  }
+  if ((cv = setupCanvas('achart'))) {
+    var cx = cv.x, CW = cv.w, CH = cv.h, cw = weekNo(), first = Math.max(1, cw - 7), n = cw - first + 1, vals = [], mx = 320, k;
+    for (k = first; k <= cw; k++) { var e = weekActivity(k).equiv; vals.push(e); if (e > mx) { mx = e; } }
+    var cL = 36, cR = 8, cT = 10, cB = 24, bw = (CW - cL - cR) / n;
+    var cY = function (v) { return cT + (mx - v) / mx * (CH - cT - cB); };
+    cx.fillStyle = '#5b6778'; cx.strokeStyle = '#c77700'; cx.lineWidth = 1; cx.setLineDash([4, 4]);
+    var lines = [150, 300], q;
+    for (q = 0; q < lines.length; q++) { cx.beginPath(); cx.moveTo(cL, cY(lines[q])); cx.lineTo(CW - cR, cY(lines[q])); cx.stroke(); cx.fillText(String(lines[q]), 2, cY(lines[q]) + 4); }
+    cx.setLineDash([]);
+    for (k = 0; k < n; k++) {
+      cx.fillStyle = vals[k] >= 150 ? '#2e7d4f' : '#1d4f91';
+      var bx = cL + k * bw + bw * 0.18, by = cY(vals[k]);
+      cx.fillRect(bx, by, bw * 0.64, CH - cB - by);
+      cx.fillStyle = '#5b6778'; cx.fillText('W' + (first + k), bx, CH - 6);
+    }
+  }
+}
+
+/* ---------- More ---------- */
+function viewMore() {
+  var h = '<h1>More</h1>';
+  h += '<div class="card"><button class="btn gold block" data-act="tool" data-v="checkin">Weekly check-in</button><div style="height:8px"></div><button class="btn ghost block" data-act="editPlan">Edit my plan & goals</button><div style="height:8px"></div><button class="btn ghost block" data-act="tool" data-v="rewards">My rewards</button></div>';
+  h += '<div class="card"><h2>Getting started with VA MOVE!</h2><ol class="pts" style="padding-left:4px"><li>Contact your VA MOVE! Program, or tell your VA Primary Care team you\u2019re interested.</li><li>Complete the MOVE!11 Getting Started Questionnaire, online or at your VA.</li><li>Review your MOVE!11 report with your MOVE! team to set first goals.</li><li>Choose a MOVE! option with your team: group sessions, individual sessions, TeleMOVE!, the MOVE! Coach app, or medication and surgery options where appropriate.</li></ol>';
+  h += '<p class="small">Not getting care at VA? The Veteran Workbook and MOVE! Coach app are open to anyone.</p>';
+  h += '<p><a href="https://www.move.va.gov" target="_blank" rel="noopener">move.va.gov</a> \u00b7 <a href="https://www.move.va.gov/MOVE/GetStarted.asp" target="_blank" rel="noopener">Get Started</a> \u00b7 <a href="https://www.move.va.gov/docs/veteranworkbook/MoveVetWorkBook-2023.pdf" target="_blank" rel="noopener">Veteran Workbook (PDF)</a> \u00b7 <a href="https://www.move.va.gov/SuccessStories/index.asp" target="_blank" rel="noopener">Success Stories</a></p></div>';
+  h += '<div class="card red"><h2>Need to talk now?</h2><p><b>Veterans Crisis Line:</b> dial <a href="tel:988">988</a> then press 1, or text <a href="sms:838255">838255</a>. Free, confidential, 24/7.</p><p style="margin:0">VA Quitline for tobacco: <a href="tel:18557848838">1-855-QUIT-VET</a></p></div>';
+  h += '<div class="card"><h2>Your data</h2><p class="muted small">Everything is stored only on this device, in this browser. Back it up now and then, especially before changing phones or clearing your browser.</p><div class="row wrap"><button class="btn sm" data-act="export">Back up (download)</button><button class="btn ghost sm" data-act="import">Restore from backup</button><button class="btn ghost sm" data-act="share">Share a summary</button></div><div style="height:10px"></div><button class="btn red sm" data-act="reset">Erase all data</button></div>';
+  h += '<div class="card small"><h2>About MyMOVE!</h2><p>MyMOVE! v' + VERSION + ' is an independent companion app that organizes the MOVE! Veteran Workbook (2023) into weekly, trackable steps. Program content is adapted from VA\u2019s MOVE! materials. It is not made, endorsed, or reviewed by the U.S. Department of Veterans Affairs and doesn\u2019t give medical advice. Your MOVE! care team and your doctor come first.</p><p style="margin:0">Built by ARTEZIQ.</p></div>';
+  return h;
+}
+ACT.editPlan = function () { openSheet('My plan', viewSetup(false)); afterSetup(); };
+ACT.export = function () {
+  try {
+    var blob = new Blob([JSON.stringify(S, null, 1)], {type: 'application/json'}), a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'mymove-backup-' + today() + '.json';
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.parentNode.removeChild(a); }, 500);
+    toast('Backup downloaded');
+  } catch (e) { toast('Backup not supported in this browser'); }
+};
+ACT['import'] = function () { $('importfile').click(); };
+ACT.share = function () {
+  var p = S.profile, cw = currentWeight(), w = weekNo(), wa = weekActivity(w), g = getGoals(w);
+  var txt = 'MyMOVE! summary \u2014 Week ' + w + ' (' + fmtLong(today()) + ')\nStart: ' + p.startWeight + ' lb \u00b7 Now: ' + cw + ' lb \u00b7 Lost: ' + r1(p.startWeight - cw) + ' lb\nGoal: ' + goalWeight() + ' lb\nThis week: ' + wa.equiv + ' active min, ' + wa.strength + ' strength days\nDays logged (last 7): ' + loggedDays(7) + '\nEating goal: ' + (g.eat || '\u2014') + '\nActivity goal: ' + (g.act || '\u2014');
+  if (navigator.share) { navigator.share({title: 'MyMOVE! summary', text: txt}).catch(function () {}); }
+  else { openSheet('Summary', '<p class="muted">Copy this and send it to your MOVE! team (for example via My HealtheVet secure messaging).</p><textarea style="min-height:220px">' + esc(txt) + '</textarea>'); }
+};
+ACT.reset = function () { if (window.confirm('Erase all MyMOVE! data on this device? This can\u2019t be undone. Back up first if you want to keep it.')) { S = blank(); save(); render(); toast('All data erased'); } };
+
+/* ---------- Tools ---------- */
+var timerH = null, breathH = null;
+function stopTimers() { if (timerH) { clearInterval(timerH); timerH = null; } if (breathH) { clearInterval(breathH); breathH = null; } }
+ACT.tool = function (v) {
+  var f = TOOLFN[v]; if (!f) { return; }
+  var h = f();
+  openSheet(TOOLS[v], h);
+  if (AFTER[v]) { AFTER[v](); }
+};
+var TOOLFN = {}, AFTER = {};
+
+TOOLFN.goal = function () {
+  var w = currentWeight();
+  return '<div class="card"><label for="g_wt">Weight (lb)</label><input type="number" inputmode="decimal" id="g_wt" value="' + w + '"><label for="g_rate">Pace</label><select id="g_rate"><option value="0.5">\u00bd lb/week</option><option value="1" selected>1 lb/week</option><option value="1.5">1\u00bd lb/week</option><option value="2">2 lb/week</option></select><div id="g_out" style="margin-top:12px"></div></div><p class="muted small">Losing 5% to 10% improves health. A safe pace is \u00bd to 2 lb a week. You aren\u2019t expected to reach a \u201cnormal\u201d BMI to see real benefits.</p>';
+};
+AFTER.goal = function () {
+  var f = function () {
+    var w = num(val('g_wt')), r = num(val('g_rate')), h = '<table><tr><th>Goal</th><th class="r">Pounds</th><th class="r">Goal weight</th><th class="r">Weeks</th></tr>', p = [5, 8, 10], i;
+    for (i = 0; i < p.length; i++) { var l = Math.round(w * p[i] / 100); h += '<tr><td>' + p[i] + '%</td><td class="r">' + l + '</td><td class="r">' + r1(w - l) + '</td><td class="r">' + Math.ceil(l / r) + '</td></tr>'; }
+    $('g_out').innerHTML = w ? h + '</table>' : '';
+  };
+  $('g_wt').oninput = f; $('g_rate').onchange = f; f();
+};
+
+TOOLFN.smart = function () {
+  var w = weekNo(), g = getGoals(w);
+  var eatEx = ['Drink water instead of regular soda this week', 'No snacking while watching TV in the evenings', 'Fill half my plate with vegetables at dinner 5 days', 'Eat breakfast every day this week', 'Log everything I eat every day this week'];
+  var actEx = ['Walk briskly 15 minutes every day this week', 'Be active 15+ minutes on 4 days and do strength twice', 'Take the stairs or do chair exercises on work breaks', 'March in place during TV commercials each evening', 'Add 500 steps a day to my average'];
+  var h = '<div class="card small"><b>SMART</b> = <b>S</b>pecific (what?), <b>M</b>easurable (how much, how often?), <b>A</b>ction-oriented (what will you do?), <b>R</b>ealistic (can you really do it?), <b>T</b>ime-based (when? this week).</div>';
+  h += '<form data-form="smart" class="card"><h2>Week ' + w + '</h2><label for="sm_eat">Healthy eating: I will\u2026</label><textarea id="sm_eat" placeholder="e.g. drink no more than 3 cans of sweetened soda this week">' + esc(g.eat) + '</textarea><div class="chips">';
+  var i;
+  for (i = 0; i < eatEx.length; i++) { h += '<button type="button" data-act="fillSmart" data-v="sm_eat|' + esc(eatEx[i]) + '">' + esc(eatEx[i]) + '</button>'; }
+  h += '</div><label for="sm_act">Physical activity: I will\u2026</label><textarea id="sm_act" placeholder="e.g. walk briskly for 15 minutes every day this week">' + esc(g.act) + '</textarea><div class="chips">';
+  for (i = 0; i < actEx.length; i++) { h += '<button type="button" data-act="fillSmart" data-v="sm_act|' + esc(actEx[i]) + '">' + esc(actEx[i]) + '</button>'; }
+  h += '</div><label for="sm_conf">How confident are you that you can do both? <span id="sm_confv">8</span>/10</label><input type="range" id="sm_conf" min="0" max="10" value="8"><p id="sm_hint" class="muted small"></p>';
+  h += '<button class="btn gold block" type="submit">Save this week\u2019s goals</button></form>';
+  return h;
+};
+AFTER.smart = function () {
+  var f = function () { var v = num(val('sm_conf')); $('sm_confv').textContent = v; $('sm_hint').textContent = v < 7 ? 'Below 7? Make the goal a little smaller or easier. Early wins build momentum.' : 'Good. A goal you\u2019re confident about is a goal you\u2019ll keep.'; };
+  $('sm_conf').oninput = f; f();
+};
+ACT.fillSmart = function (v) { var i = v.indexOf('|'); $(v.slice(0, i)).value = v.slice(i + 1); };
+function submitSmart() {
+  var g = getGoals(weekNo());
+  g.eat = val('sm_eat').replace(/^\s+|\s+$/g, ''); g.act = val('sm_act').replace(/^\s+|\s+$/g, '');
+  save(); closeSheet(true); toast('Goals saved for this week');
+}
+
+TOOLFN.why = function () { return '<div class="card"><p>Your reasons are your fuel. Look back at them when you feel discouraged.</p><p class="tip">' + (S.profile.reasons ? esc(S.profile.reasons).replace(/\n/g, '<br>') : 'You haven\u2019t written your reasons yet.') + '</p><button class="btn" data-act="editPlan">Edit my reasons</button></div>'; };
+
+TOOLFN.rewards = function () {
+  var h = '<div class="card"><p class="muted small">Pick rewards that motivate you (not food). Small ones for weekly goals, bigger ones for weight milestones.</p>', i;
+  for (i = 0; i < REWARDS.length; i++) { h += '<label class="check"><input type="checkbox" data-act="rewardToggle" data-v="' + esc(REWARDS[i]) + '"' + (S.rewards.indexOf(REWARDS[i]) >= 0 ? ' checked' : '') + '> <span>' + esc(REWARDS[i]) + '</span></label>'; }
+  h += '</div><form data-form="reward" class="card"><label for="rw_new">Add your own</label><div class="row"><input type="text" id="rw_new" placeholder="e.g. New fishing lure"><button class="btn sm" type="submit">Add</button></div><div class="list" style="margin-top:8px">';
+  for (i = 0; i < S.customRewards.length; i++) { h += '<div class="item"><span>' + esc(S.customRewards[i]) + '</span><button type="button" class="x" data-act="delReward" data-v="' + i + '">\u2715</button></div>'; }
+  return h + '</div></form>';
+};
+ACT.rewardToggle = function (v, el) { var i = S.rewards.indexOf(v); if (el.checked && i < 0) { S.rewards.push(v); } if (!el.checked && i >= 0) { S.rewards.splice(i, 1); } save(); };
+ACT.delReward = function (v) { S.customRewards.splice(num(v), 1); save(); ACT.tool('rewards'); };
+function submitReward() { var v = val('rw_new').replace(/^\s+|\s+$/g, ''); if (v) { S.customRewards.push(v); save(); } ACT.tool('rewards'); }
+
+TOOLFN.drink = function () {
+  var h = '<div class="card"><label for="dk_d">What do you usually drink?</label><select id="dk_d">', i;
+  for (i = 0; i < DRINKS.length - 4; i++) { h += '<option value="' + i + '">' + esc(DRINKS[i][0]) + '</option>'; }
+  h += '</select><label for="dk_n">How many 20 oz bottles a day?</label><input type="number" inputmode="decimal" id="dk_n" value="1" min="0" max="10" step="0.5"><div id="dk_out" style="margin-top:12px"></div></div>';
+  h += '<div class="card"><h3 style="margin-top:0">Calories by drink</h3><table><tr><th>Drink</th><th class="r">20 oz</th><th class="r">12 oz</th></tr>';
+  for (i = 0; i < DRINKS.length; i++) { h += '<tr><td>' + esc(DRINKS[i][0]) + '</td><td class="r">' + DRINKS[i][1] + '</td><td class="r">' + DRINKS[i][2] + '</td></tr>'; }
+  return h + '</table><p class="muted small" style="margin:8px 0 0">Coffee shop tip: skim milk, smallest size, sugar-free or no syrup, skip the whip.</p></div>';
+};
+AFTER.drink = function () {
+  var f = function () {
+    var d = DRINKS[num(val('dk_d'))], n = num(val('dk_n')), small = (d[1] - d[2]) * n, all = d[1] * n;
+    $('dk_out').innerHTML = '<div class="grid2"><div class="stat"><b>' + commas(small) + '</b><span>cal/day saved by going to 12 oz</span></div><div class="stat"><b>' + commas(all) + '</b><span>cal/day saved by switching to water</span></div></div><p class="small" style="margin:8px 0 0">Switching to water every day could add up to about <b>' + r1(all * 365 / 3500) + ' lb</b> a year.</p>';
+  };
+  $('dk_d').onchange = f; $('dk_n').oninput = f; f();
+};
+
+TOOLFN.burn = function () {
+  var h = '<div class="card"><p class="muted small">Calories burned in 10 minutes. Ranges are for men about 175\u2013250 lb and women about 140\u2013200 lb; heavier people burn more.</p><table><tr><th>Activity</th><th class="r">Men</th><th class="r">Women</th></tr>', i, last = '';
+  for (i = 0; i < BURN.length; i++) { if (BURN[i][0] !== last) { last = BURN[i][0]; h += '<tr><th colspan="3">' + last + '</th></tr>'; } h += '<tr><td>' + esc(BURN[i][1]) + '</td><td class="r">' + BURN[i][2] + '</td><td class="r">' + BURN[i][3] + '</td></tr>'; }
+  return h + '</table></div>';
+};
+TOOLFN.swaps = function () {
+  var h = '<div class="card"><p class="muted small">Small swaps add up without giving up the meal.</p><table><tr><th>Swap</th><th class="r">Saves</th></tr>', i, last = '';
+  for (i = 0; i < SWAPS.length; i++) { if (SWAPS[i][0] !== last) { last = SWAPS[i][0]; h += '<tr><th colspan="2">' + last + '</th></tr>'; } h += '<tr><td>' + esc(SWAPS[i][1]) + '</td><td class="r">' + SWAPS[i][2] + '</td></tr>'; }
+  return h + '</table></div>';
+};
+
+TOOLFN.plate = function () {
+  return '<div class="card"><p>Think about your last meal. About how much of the plate was each group?</p><label>Non-starchy vegetables & fruit: <span id="pl_v1">50</span>%</label><input type="range" id="pl_v" min="0" max="100" step="5" value="50"><label>Whole grains or starchy veg: <span id="pl_s1">25</span>%</label><input type="range" id="pl_s" min="0" max="100" step="5" value="25"><label>Protein: <span id="pl_p1">25</span>%</label><input type="range" id="pl_p" min="0" max="100" step="5" value="25"><label for="pl_d">Drink</label><select id="pl_d"><option value="0">Water, unsweetened tea or coffee</option><option value="1">Low-fat or fat-free milk</option><option value="2">Sugary drink, juice or alcohol</option></select><div id="pl_out" class="card gold" style="margin:12px 0 0"></div></div><p class="muted small">Combination foods like stew or a burger cover more than one section. Split them up in your head.</p>';
+};
+AFTER.plate = function () {
+  var f = function () {
+    var v = num(val('pl_v')), s = num(val('pl_s')), p = num(val('pl_p')), d = val('pl_d'), tips = [], score = 0;
+    $('pl_v1').textContent = v; $('pl_s1').textContent = s; $('pl_p1').textContent = p;
+    if (v >= 45) { score++; } else { tips.push('Add more non-starchy vegetables or fruit, aiming for half the plate.'); }
+    if (s <= 30) { score++; } else { tips.push('Shrink the starch to about a quarter of the plate, and pick whole grains.'); }
+    if (p <= 30 && p >= 15) { score++; } else if (p > 30) { tips.push('Protein is big. Aim for about a quarter (around 3 oz, the size of a deck of cards).'); } else { tips.push('Add some lean protein to help you stay full.'); }
+    if (d !== '2') { score++; } else { tips.push('Swap the sugary drink for water to save calories.'); }
+    if (v + s + p !== 100) { tips.push('(Your sections add up to ' + (v + s + p) + '%. That\u2019s fine; it\u2019s a rough check.)'); }
+    $('pl_out').innerHTML = '<b>' + ['Room to grow', 'Getting there', 'Getting there', 'Nearly there', 'Healthy plate!'][score] + '</b> (' + score + '/4)' + (tips.length ? '<ul class="pts" style="margin-top:6px">' + tips.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '<p style="margin:6px 0 0">That plate matches the MOVE! Healthy Plate.</p>');
+  };
+  var ids = ['pl_v', 'pl_s', 'pl_p', 'pl_d'], i;
+  for (i = 0; i < ids.length; i++) { $(ids[i]).oninput = f; $(ids[i]).onchange = f; }
+  f();
+};
+
+TOOLFN.portions = function () {
+  return '<div class="card"><p class="muted small">Use everyday objects or your hand to estimate servings.</p><table><tr><th>Serving</th><th>Looks about like</th></tr><tr><td>1 teaspoon</td><td>Tip of your thumb</td></tr><tr><td>1 tablespoon</td><td>Whole thumb</td></tr><tr><td>1 ounce (nuts, cheese)</td><td>A small handful / 2 dice</td></tr><tr><td>3 ounces meat or fish</td><td>A deck of cards or your palm</td></tr><tr><td>\u00bc cup</td><td>A golf ball</td></tr><tr><td>\u00bd cup</td><td>Half a baseball / a cupped hand</td></tr><tr><td>1 cup</td><td>A baseball or your fist</td></tr><tr><td>1 medium potato</td><td>A computer mouse</td></tr><tr><td>1 medium fruit</td><td>A tennis ball</td></tr></table><p class="small" style="margin:10px 0 0">A <b>serving</b> is a standard amount. A <b>portion</b> is what you choose to eat. Many people eat 2 or more servings without realizing it. Measure for a week to train your eye.</p></div>';
+};
+
+TOOLFN.hr = function () {
+  return '<div class="card"><label for="hr_age">Your age</label><input type="number" inputmode="numeric" id="hr_age" min="18" max="100" value="55"><div id="hr_out" style="margin-top:12px"></div></div><div class="card small"><h3 style="margin-top:0">Take your pulse</h3><ol class="pts" style="padding-left:4px"><li>Place your index and middle fingers (not thumb) on your wrist below the base of the thumb.</li><li>Count beats for 15 seconds.</li><li>Multiply by 4 (or double it twice).</li></ol><p style="margin:0">Taking a beta-blocker or similar medicine? Your heart rate may stay low. Use the effort scale (RPE) instead.</p></div>';
+};
+AFTER.hr = function () {
+  var f = function () { var a = num(val('hr_age')), mx = 220 - a; if (!a) { return; } $('hr_out').innerHTML = '<div class="grid3"><div class="stat"><b>' + Math.round(mx * 0.5) + '</b><span>50% moderate</span></div><div class="stat"><b>' + Math.round(mx * 0.7) + '</b><span>70%</span></div><div class="stat"><b>' + Math.round(mx * 0.85) + '</b><span>85% vigorous</span></div></div><p class="small" style="margin:8px 0 0">Estimated maximum: ' + mx + ' beats per minute. Moderate activity sits near the 50% end; vigorous nearer 85%.</p>'; };
+  $('hr_age').oninput = f; f();
+};
+TOOLFN.rpe = function () {
+  var rows = [['1', 'Very light', 'Anything but sleeping: watching TV, riding in a car.'], ['2\u20133', 'Light', 'Could keep it up for hours. Easy to talk.'], ['4\u20136', 'Moderate', 'Breathing harder. Can hold a short conversation, can\u2019t sing.'], ['7\u20138', 'Vigorous', 'Near uncomfortable. Short of breath; a sentence at a time.'], ['9', 'Very hard', 'Very hard to keep going. Barely a word.'], ['10', 'Max effort', 'Feels impossible to continue. Can\u2019t talk.']], h = '<div class="card"><table><tr><th>RPE</th><th>Level</th><th>How it feels</th></tr>', i;
+  for (i = 0; i < rows.length; i++) { h += '<tr><td><b>' + rows[i][0] + '</b></td><td>' + rows[i][1] + '</td><td>' + rows[i][2] + '</td></tr>'; }
+  return h + '</table><p class="small" style="margin:10px 0 0">Cardio: aim for <b>4\u20138</b>. Strength work: <b>7\u20139</b>. What feels hard now will get easier as you get fitter.</p></div>';
+};
+
+TOOLFN.thought = function () {
+  var h = '<div class="card"><h3 style="margin-top:0">Common unhelpful thoughts</h3><table><tr><th>Type</th><th>Sounds like</th><th>Rethink it</th></tr>', i;
+  for (i = 0; i < THOUGHTS.length; i++) { h += '<tr><td><b>' + esc(THOUGHTS[i][0]) + '</b></td><td>' + esc(THOUGHTS[i][1]) + '</td><td>' + esc(THOUGHTS[i][2]) + '</td></tr>'; }
+  h += '</table></div><form data-form="thought" class="card"><h2>Rethink it in 4 steps</h2><label for="th_sit">Situation (when, where, what was happening)</label><input type="text" id="th_sit"><label for="th_feel">What were you feeling?</label><input type="text" id="th_feel" placeholder="Anxious, stressed, bored...">';
+  h += '<label for="th_1">1. Recognize: what were you telling yourself?</label><textarea id="th_1"></textarea><label for="th_type">Type of thought</label><select id="th_type"><option value="">Not sure</option>';
+  for (i = 0; i < THOUGHTS.length; i++) { h += '<option>' + esc(THOUGHTS[i][0]) + '</option>'; }
+  h += '</select><label for="th_2">2. Question it: is it realistic? What\u2019s the evidence?</label><textarea id="th_2"></textarea><label for="th_3">3. Is it helpful to think this way?</label><textarea id="th_3"></textarea><label for="th_4">4. Consider alternatives: what else could be true?</label><textarea id="th_4"></textarea><button class="btn gold block" type="submit" style="margin-top:12px">Save</button></form>';
+  if (S.thoughts.length) {
+    h += '<div class="card"><h3 style="margin-top:0">My rethinks</h3><div class="list">';
+    for (i = S.thoughts.length - 1; i >= 0 && i >= S.thoughts.length - 6; i--) { h += '<div class="item"><div><div class="muted small">' + fmtLong(S.thoughts[i].date) + (S.thoughts[i].type ? ' \u00b7 ' + esc(S.thoughts[i].type) : '') + '</div><div>\u201c' + esc(S.thoughts[i].t1) + '\u201d</div><div><b>\u2192 ' + esc(S.thoughts[i].t4) + '</b></div></div></div>'; }
+    h += '</div></div>';
+  }
+  return h;
+};
+function submitThought() { if (!val('th_1')) { toast('Write the thought first'); return; } S.thoughts.push({date: today(), sit: val('th_sit'), feel: val('th_feel'), type: val('th_type'), t1: val('th_1'), t2: val('th_2'), t3: val('th_3'), t4: val('th_4')}); save(); toast('Saved. That\u2019s real progress.'); ACT.tool('thought'); }
+
+TOOLFN.triggers = function () {
+  var h = '<div class="card"><p class="muted small">How often do you eat more than you planned in each situation? 1 = never, 2 = occasionally, 3 = sometimes, 4 = often.</p>', i;
+  for (i = 0; i < TRIGGERS.length; i++) {
+    var v = S.triggers[i] || 0, j;
+    h += '<div class="row between" style="padding:6px 0;border-bottom:1px solid #e6ebf2"><span class="grow small">' + esc(TRIGGERS[i]) + '</span><div class="row" style="gap:4px">';
+    for (j = 1; j <= 4; j++) { h += '<button class="btn sm ' + (v === j ? '' : 'ghost') + '" style="min-width:38px;padding:6px" data-act="trig" data-v="' + i + '|' + j + '">' + j + '</button>'; }
+    h += '</div></div>';
+  }
+  var top = [];
+  for (i = 0; i < TRIGGERS.length; i++) { if ((S.triggers[i] || 0) >= 3) { top.push(TRIGGERS[i].toLowerCase()); } }
+  h += '</div><div class="card gold"><b>My top triggers:</b> ' + (top.length ? esc(top.join(', ')) : 'Rate the situations above to see them.') + '<p class="small" style="margin:8px 0 0">For each one, plan a non-food response: take a walk, call a friend, breathe, pray, squeeze a stress ball, or wait 15 minutes.</p></div>';
+  return h;
+};
+ACT.trig = function (v) { var p = v.split('|'); S.triggers[p[0]] = num(p[1]); save(); var y = $('sheetbody').scrollTop; ACT.tool('triggers'); $('sheetbody').scrollTop = y; };
+
+TOOLFN.plan = function () {
+  var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], h = '<form data-form="plan" class="card"><p class="muted small">Plan meals for the week, then build your shopping list from the plan. Aim for 2\u20133 balanced meals and 1\u20132 snacks, about 3\u20134 hours apart.</p>', i;
+  for (i = 0; i < days.length; i++) { h += '<label for="pd_' + i + '">' + days[i] + '</label><input type="text" id="pd_' + i + '" value="' + esc(S.plan.days[days[i]] || '') + '" placeholder="B: oatmeal & berries \u00b7 L: turkey wrap \u00b7 D: chicken, rice, broccoli">'; }
+  h += '<label for="pd_list">Shopping list</label><textarea id="pd_list" style="min-height:140px" placeholder="One item per line">' + esc(S.plan.list || '') + '</textarea><p class="muted small">Shop the outside aisles first, buy frozen or in-season produce to save, and don\u2019t shop hungry.</p><button class="btn gold block" type="submit">Save plan</button></form>';
+  return h;
+};
+function submitPlan() { var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], i; for (i = 0; i < 7; i++) { S.plan.days[days[i]] = val('pd_' + i); } S.plan.list = val('pd_list'); save(); toast('Plan saved'); }
+
+TOOLFN.label = function () {
+  return '<div class="card"><h3 style="margin-top:0">Read it in this order</h3><ol class="pts" style="padding-left:4px"><li><b>Serving size & servings per container.</b> All the numbers are for ONE serving.</li><li><b>Calories</b> per serving.</li><li><b>% Daily Value:</b> 5% or less is low, 20% or more is high. Go low on saturated fat, sodium and added sugars; high on fiber.</li><li><b>Ingredients:</b> listed by weight. For whole grains, look for \u201cwhole\u201d in the first or second ingredient.</li></ol></div><div class="card"><h3 style="margin-top:0">How many calories did I really eat?</h3><div class="grid2"><div><label for="lb_cal">Calories per serving</label><input type="number" inputmode="numeric" id="lb_cal" value="150"></div><div><label for="lb_srv">Servings I ate</label><input type="number" inputmode="decimal" id="lb_srv" value="2" step="0.5"></div></div><div id="lb_out" class="big" style="margin-top:10px"></div></div>';
+};
+AFTER.label = function () { var f = function () { $('lb_out').textContent = commas(num(val('lb_cal')) * num(val('lb_srv'))) + ' calories'; }; $('lb_cal').oninput = f; $('lb_srv').oninput = f; f(); };
+TOOLFN.temps = function () {
+  return '<div class="card"><p class="muted small">Use a food thermometer in the thickest part.</p><table><tr><th>Food</th><th class="r">Safe temp</th></tr><tr><td>Chicken & turkey (whole or ground)</td><td class="r">165\u00b0F</td></tr><tr><td>Ground beef, pork, lamb</td><td class="r">160\u00b0F</td></tr><tr><td>Steaks, roasts, chops (rest 3 min)</td><td class="r">145\u00b0F</td></tr><tr><td>Fish & shellfish</td><td class="r">145\u00b0F</td></tr><tr><td>Egg dishes</td><td class="r">160\u00b0F</td></tr><tr><td>Leftovers & casseroles</td><td class="r">165\u00b0F</td></tr></table><p class="small" style="margin:10px 0 0">Refrigerate leftovers within 2 hours (1 hour if it\u2019s over 90\u00b0F outside). Keep the fridge at 40\u00b0F or below. Wash hands and cutting boards; keep raw meat separate.</p></div><div class="card"><h3 style="margin-top:0">Healthier cooking</h3><p style="margin:0">Bake, broil, grill, roast, steam, poach or stir-fry with a little oil or cooking spray. Season with herbs, spices, citrus, vinegar or salsa instead of butter, salt and cream sauces.</p></div>';
+};
+
+TOOLFN.problem = function () {
+  var h = '<form data-form="problem" class="card"><label for="pb_1">1. Describe the problem in detail</label><textarea id="pb_1" placeholder="I snack after dinner most nights while watching TV."></textarea><label for="pb_2">2. Brainstorm options (as many as you can)</label><textarea id="pb_2" placeholder="Brush teeth after dinner. Keep chips out of the house. Walk after dinner. Hot tea instead."></textarea><label for="pb_3">3. Pick one to try</label><input type="text" id="pb_3"><label for="pb_4">4. Make a positive plan (what, when, where, how)</label><textarea id="pb_4"></textarea><label for="pb_5">5. Try it, then come back: how did it go?</label><textarea id="pb_5" placeholder="Fill this in after you try it. Didn\u2019t work? Pick another option."></textarea><button class="btn gold block" type="submit" style="margin-top:12px">Save</button></form>', i;
+  if (S.problems.length) { h += '<div class="card"><h3 style="margin-top:0">My problem-solving</h3><div class="list">'; for (i = S.problems.length - 1; i >= 0 && i >= S.problems.length - 6; i--) { h += '<div class="item"><div><div class="muted small">' + fmtLong(S.problems[i].date) + '</div><div>' + esc(S.problems[i].p) + '</div><div><b>Plan: ' + esc(S.problems[i].pick) + '</b></div>' + (S.problems[i].res ? '<div class="small">Result: ' + esc(S.problems[i].res) + '</div>' : '') + '</div></div>'; } h += '</div></div>'; }
+  return h;
+};
+function submitProblem() { if (!val('pb_1')) { toast('Describe the problem first'); return; } S.problems.push({date: today(), p: val('pb_1'), opts: val('pb_2'), pick: val('pb_3'), plan: val('pb_4'), res: val('pb_5')}); save(); toast('Saved. Now try it out.'); ACT.tool('problem'); }
+
+TOOLFN.steps = function () {
+  return '<div class="card"><label for="st_base">My average steps per day now</label><input type="number" inputmode="numeric" id="st_base" value="3000" step="100"><label for="st_add">Add each week</label><select id="st_add"><option value="250">250 steps a day</option><option value="500" selected>500 steps a day</option><option value="1000">1,000 steps a day</option></select><div id="st_out" style="margin-top:12px"></div></div><p class="muted small">Find your baseline by wearing your tracker for 3\u20137 normal days. Walking isn\u2019t the only way; if it\u2019s not for you, build minutes of another activity instead.</p>';
+};
+AFTER.steps = function () {
+  var f = function () { var b = num(val('st_base')), a = num(val('st_add')), h = '<table><tr><th>Week</th><th class="r">Daily step goal</th></tr>', i; for (i = 1; i <= 8; i++) { h += '<tr><td>Week ' + i + '</td><td class="r">' + commas(b + a * i) + '</td></tr>'; } $('st_out').innerHTML = h + '</table>'; };
+  $('st_base').oninput = f; $('st_add').onchange = f; f();
+};
+
+TOOLFN.craving = function () {
+  return '<div class="card"><h3 style="margin-top:0">Hunger or craving?</h3><table><tr><th>Hunger</th><th>Craving</th></tr><tr><td>Builds slowly</td><td>Hits suddenly</td></tr><tr><td>Many foods would do</td><td>Wants one specific food</td></tr><tr><td>Stomach signals</td><td>Often set off by a feeling, sight or smell</td></tr><tr><td>Stops when you\u2019re full</td><td>Fades if you wait it out</td></tr></table></div><div class="card" style="text-align:center"><p>Ride the wave. Most cravings fade in about 15 minutes.</p><div class="timer" id="cr_t">15:00</div><button class="btn gold" id="cr_btn" data-act="cravingStart">Start 15-minute timer</button><p class="muted small" style="margin-top:12px">Meanwhile: drink a glass of water, take a walk, call or text someone, brush your teeth, do a chore, or try the breathing exercise.</p></div><div class="card"><p class="small" style="margin:0">Still truly hungry after 15 minutes? Have a planned, portioned snack on a plate and log it. All foods can fit.</p></div>';
+};
+ACT.cravingStart = function () {
+  stopTimers();
+  var end = new Date().getTime() + 15 * 60000, b = $('cr_btn');
+  b.textContent = 'Running\u2026'; b.disabled = true;
+  timerH = setInterval(function () {
+    var left = Math.max(0, Math.round((end - new Date().getTime()) / 1000)), el = $('cr_t');
+    if (!el) { stopTimers(); return; }
+    el.textContent = Math.floor(left / 60) + ':' + pad(left % 60);
+    if (left <= 0) { stopTimers(); el.textContent = 'Done!'; b.disabled = false; b.textContent = 'Start again'; toast('You rode it out. How do you feel?'); }
+  }, 500);
+};
+
+TOOLFN.breathe = function () {
+  return '<div class="card"><p>Slow, steady breathing calms your body and mind. Follow the circle: breathe in 4, hold 4, out 4, hold 4.</p><div class="breath" id="br_c"></div><div class="breathlabel" id="br_l">Ready</div><div style="text-align:center;margin-top:14px"><button class="btn gold" data-act="breatheStart">Start 2 minutes</button></div></div><div class="card small"><h3 style="margin-top:0">Mindful moment</h3><p style="margin:0">Notice 5 things you see, 4 you can touch, 3 you hear, 2 you smell, and 1 you taste. No judging, just noticing.</p></div>';
+};
+ACT.breatheStart = function () {
+  stopTimers();
+  var phases = ['Breathe in', 'Hold', 'Breathe out', 'Hold'], i = 0, n = 0;
+  var step = function () {
+    var c = $('br_c'), l = $('br_l'); if (!c) { stopTimers(); return; }
+    if (n >= 32) { stopTimers(); l.textContent = 'Well done'; c.className = 'breath'; return; }
+    l.textContent = phases[i];
+    if (i === 0) { c.className = 'breath in'; } else if (i === 2) { c.className = 'breath'; }
+    i = (i + 1) % 4; n++;
+  };
+  step(); breathH = setInterval(step, 4000);
+};
+
+TOOLFN.slip = function () {
+  var sp = S.slipPlan || {};
+  return '<form data-form="slip" class="card"><p class="muted small">Plan now, while you\u2019re calm, so you know exactly what to do when a slip happens.</p><label for="sl_1">My high-risk situations</label><textarea id="sl_1" placeholder="Holidays, long work days, poker night...">' + esc(sp.risk) + '</textarea><label for="sl_2">Early warning signs I\u2019m slipping</label><textarea id="sl_2" placeholder="Skipping my log, stopping weigh-ins, \u201cwhy bother\u201d thoughts...">' + esc(sp.signs) + '</textarea><label for="sl_3">What I\u2019ll do to get back on track</label><textarea id="sl_3" placeholder="Log my next meal honestly. Take a walk today. Reread my reasons.">' + esc(sp.plan) + '</textarea><label for="sl_4">Who I\u2019ll reach out to</label><input type="text" id="sl_4" value="' + esc(sp.who) + '"><button class="btn gold block" type="submit" style="margin-top:12px">Save my slip plan</button></form><div class="card small"><b>Remember:</b> a slip is one meal or one day. It only turns into a relapse if you stop getting back on. Start again at the very next choice.</div>';
+};
+function submitSlip() { S.slipPlan = {risk: val('sl_1'), signs: val('sl_2'), plan: val('sl_3'), who: val('sl_4')}; save(); toast('Slip plan saved'); }
+
+TOOLFN.dining = function () {
+  var items = ['Look at the menu online before I go', 'Eat a small healthy snack beforehand so I don\u2019t arrive starving', 'Order first so others don\u2019t sway me', 'Choose grilled, baked, broiled or steamed', 'Sauces and dressing on the side', 'Swap fries for salad or vegetables', 'Water or an unsweetened drink', 'Box half before I start, or split it', 'Pass on the bread or chip basket', 'Fast food: smallest size, no combo', 'Takeout: serve it on a plate, put the rest away', 'Log it honestly afterward'];
+  var h = '<div class="card"><p class="muted small">Check off the strategies you\u2019ll use next time.</p>', i;
+  for (i = 0; i < items.length; i++) { h += '<label class="check"><input type="checkbox"> <span>' + esc(items[i]) + '</span></label>'; }
+  return h + '</div><div class="card small"><b>After eating out:</b> no guilt, and no skipping meals to make up for it. Get right back on plan at the next meal.</div>';
+};
+
+TOOLFN.stress = function () {
+  var h = '<form data-form="stress" class="card"><label for="ss_l">Stress right now: <span id="ss_v">5</span>/10</label><input type="range" id="ss_l" min="0" max="10" value="5"><label for="ss_s">What\u2019s causing it?</label><input type="text" id="ss_s"><label for="ss_c">Can I change it?</label><select id="ss_c"><option>Yes, I can change it</option><option>Partly</option><option>No, I need to cope with it</option></select><label for="ss_r">How I\u2019ll respond (not with food)</label><input type="text" id="ss_r" placeholder="Walk, call a buddy, breathe, pray, music..."><button class="btn gold block" type="submit" style="margin-top:12px">Save</button></form>', i;
+  if (S.stress.length) { h += '<div class="card"><h3 style="margin-top:0">Recent</h3><div class="list">'; for (i = S.stress.length - 1; i >= 0 && i >= S.stress.length - 7; i--) { h += '<div class="item"><div class="grow"><div class="muted small">' + fmtLong(S.stress[i].date) + '</div><div>' + esc(S.stress[i].src) + '</div><div class="small">\u2192 ' + esc(S.stress[i].resp) + '</div></div><b>' + S.stress[i].lvl + '/10</b></div>'; } h += '</div></div>'; }
+  return h + '<div class="card"><button class="btn ghost block" data-act="tool" data-v="breathe">Try calm breathing</button></div>';
+};
+AFTER.stress = function () { $('ss_l').oninput = function () { $('ss_v').textContent = this.value; }; };
+function submitStress() { S.stress.push({date: today(), lvl: num(val('ss_l')), src: val('ss_s'), change: val('ss_c'), resp: val('ss_r')}); save(); toast('Saved'); ACT.tool('stress'); }
+
+TOOLFN.toolkit = function () {
+  var items = ['Daily food log', 'Activity log', 'Weighing in at least weekly', 'SMART goals each week', 'My Healthy Plate', 'Rethinking unhelpful thoughts', 'Managing triggers & cravings', 'Meal planning & shopping list', 'Reading food labels', 'Problem solving', 'Slip plan', 'Dining-out strategies', 'Stress management', 'Support team', 'Rewards'], h = '<div class="card"><p class="muted small">Which tools will you keep using for maintenance? Check the ones that work for you.</p>', i;
+  for (i = 0; i < items.length; i++) { h += '<label class="check"><input type="checkbox" data-act="kit" data-v="' + i + '"' + (S.toolkit[i] ? ' checked' : '') + '> <span>' + esc(items[i]) + '</span></label>'; }
+  return h + '</div><div class="card small"><b>Maintenance plan idea:</b> pick a range around your current weight. If you go above it, restart daily logging and weekly check-ins, and reach out to your MOVE! team.</div>';
+};
+ACT.kit = function (v, el) { S.toolkit[v] = el.checked; save(); };
+
+TOOLFN.care = function () { return '<form data-form="care" class="card"><label for="cr_q">Questions and notes for my next visit</label><textarea id="cr_q" style="min-height:180px" placeholder="How do my medicines affect my weight? Is it safe for me to start strength training? What are my latest numbers?">' + esc(S.care) + '</textarea><button class="btn gold block" type="submit" style="margin-top:12px">Save</button></form><div class="card"><button class="btn ghost block" data-act="share">Share my progress summary</button></div>'; };
+function submitCare() { S.care = val('cr_q'); save(); toast('Saved'); }
+
+TOOLFN.checkin = function () {
+  var w = weekNo(), pw = w > 1 ? w - 1 : 1, g = getGoals(pw), h = '<form data-form="checkin">', i;
+  h += '<div class="card"><h2>Progress check-in</h2><p class="muted small">Reflecting on ' + (w > 1 ? 'last week (week ' + pw + ')' : 'this first week') + '.</p>';
+  h += '<label>Did you meet your healthy eating goal?' + (g.eat ? '<br><span class="muted small">\u201c' + esc(g.eat) + '\u201d</span>' : '') + '</label><select id="ck_e"><option>Yes</option><option>Partly</option><option>No</option><option>No goal set</option></select>';
+  h += '<label>Did you meet your physical activity goal?' + (g.act ? '<br><span class="muted small">\u201c' + esc(g.act) + '\u201d</span>' : '') + '</label><select id="ck_a"><option>Yes</option><option>Partly</option><option>No</option><option>No goal set</option></select>';
+  h += '<label for="ck_w">My weight today (lb)</label><input type="number" inputmode="decimal" id="ck_w" step="0.1" value="' + currentWeight() + '">';
+  h += '<label for="ck_win">What successes did you have?</label><textarea id="ck_win"></textarea><label for="ck_ch">What challenges did you run into?</label><textarea id="ck_ch"></textarea><label for="ck_help">What helped, or what will you do differently this week?</label><textarea id="ck_help"></textarea></div>';
+  h += '<div class="card"><h2>Even small changes make a difference</h2><p class="muted small">What benefits have you noticed?</p>';
+  for (i = 0; i < BENEFITS.length; i++) { h += '<label class="check"><input type="checkbox" id="ck_b' + i + '"> <span>' + BENEFITS[i] + '</span></label>'; }
+  h += '</div><button class="btn gold block" type="submit">Save check-in & set this week\u2019s goals</button></form>';
+  return h;
+};
+function submitCheckin() {
+  var b = [], i, lb = r1(num(val('ck_w')));
+  for (i = 0; i < BENEFITS.length; i++) { if (checked('ck_b' + i)) { b.push(BENEFITS[i]); } }
+  S.checkins.push({date: today(), week: weekNo(), eatMet: val('ck_e'), actMet: val('ck_a'), lb: lb || '', wins: val('ck_win'), chal: val('ck_ch'), help: val('ck_help'), benefits: b});
+  if (lb >= 80) { var found = false; for (i = 0; i < S.weights.length; i++) { if (S.weights[i].date === today()) { S.weights[i].lb = lb; found = true; } } if (!found) { S.weights.push({date: today(), lb: lb}); } }
+  save(); toast('Check-in saved. Now set this week\u2019s goals.');
+  ACT.tool('smart');
+}
+
+/* ---------- Sheet ---------- */
+function openSheet(title, html) { stopTimers(); $('sheettitle').textContent = title; $('sheetbody').innerHTML = html; $('sheetwrap').className = ''; $('sheetbody').scrollTop = 0; document.body.style.overflow = 'hidden'; }
+function closeSheet(rerender) { stopTimers(); $('sheetwrap').className = 'hidden'; $('sheetbody').innerHTML = ''; document.body.style.overflow = ''; if (rerender !== false) { render(); } }
+ACT.closeSheet = function () { closeSheet(true); };
+ACT.tab = function (v) { if (v === 'log') { S.ui.logDate = today(); } setTab(v); };
+
+/* ---------- Events ---------- */
+document.addEventListener('click', function (e) {
+  var el = e.target;
+  while (el && el.nodeType === 1 && !el.getAttribute('data-act')) { el = el.parentNode; }
+  if (!el || el.nodeType !== 1) { return; }
+  var a = el.getAttribute('data-act');
+  if (el.tagName === 'INPUT') { return; }
+  if (ACT[a]) { e.preventDefault(); ACT[a](el.getAttribute('data-v'), el); }
+});
+document.addEventListener('change', function (e) {
+  var el = e.target;
+  if (el.tagName === 'INPUT' && el.type === 'checkbox' && el.getAttribute('data-act')) { var a = el.getAttribute('data-act'); if (ACT[a]) { ACT[a](el.getAttribute('data-v'), el); } }
+});
+document.addEventListener('submit', function (e) {
+  var f = e.target, k = f.getAttribute('data-form'); if (!k) { return; }
+  e.preventDefault();
+  if (k === 'setup') { submitSetup(); }
+  else if (k === 'food') { submitFood(f.getAttribute('data-v')); }
+  else if (k === 'act') { submitAct(f.getAttribute('data-v')); }
+  else if (k === 'weight') { submitWeight(); }
+  else if (k === 'smart') { submitSmart(); }
+  else if (k === 'reward') { submitReward(); }
+  else if (k === 'thought') { submitThought(); }
+  else if (k === 'plan') { submitPlan(); }
+  else if (k === 'problem') { submitProblem(); }
+  else if (k === 'slip') { submitSlip(); }
+  else if (k === 'stress') { submitStress(); }
+  else if (k === 'care') { submitCare(); }
+  else if (k === 'checkin') { submitCheckin(); }
+});
+$('sheetwrap').addEventListener('click', function (e) { if (e.target === this) { closeSheet(true); } });
+document.addEventListener('keydown', function (e) { if (e.keyCode === 27 && $('sheetwrap').className !== 'hidden') { closeSheet(true); } });
+$('importfile').addEventListener('change', function () {
+  var file = this.files && this.files[0], input = this; if (!file) { return; }
+  var rd = new FileReader();
+  rd.onload = function () {
+    try {
+      var o = JSON.parse(rd.result);
+      if (!o || typeof o !== 'object' || !('profile' in o)) { throw new Error('bad'); }
+      if (!window.confirm('Replace the data on this device with this backup?')) { return; }
+      var d = blank(), k; for (k in d) { if (d.hasOwnProperty(k) && !(k in o)) { o[k] = d[k]; } }
+      S = o; save(); render(); toast('Backup restored');
+    } catch (err) { toast('That file isn\u2019t a MyMOVE! backup'); }
+    input.value = '';
+  };
+  rd.readAsText(file);
+});
+window.addEventListener('resize', function () { if (S.ui.tab === 'progress' && S.profile) { drawCharts(); } });
+
+/* ---------- Start ---------- */
+if (S.profile) { setTab(S.ui.tab || 'today'); } else { render(); }
+if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
+})();
+</script>
+</body>
+</html>
