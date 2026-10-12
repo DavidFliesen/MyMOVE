@@ -1,4 +1,4 @@
-# MyMOVE! — v1.0.0
+# MyMOVE! — v1.1.0
 
 **A pocket companion for Veterans in the VA MOVE! Weight Management Program.**
 
@@ -9,6 +9,17 @@ MyMOVE! turns the *MOVE! Veteran Workbook (2023)* into simple weekly steps you c
 ---
 
 ## Features
+
+### Already enrolled? Pick up where you are
+MyMOVE! works whether you're starting MOVE! today or are already weeks in.
+
+- **At setup**, choose **Already enrolled**. Enter your current week (for example, week 7) or your program start date; whichever you enter, the other fills in automatically.
+- **Enter your starting weight** from when you began MOVE!, and optionally your weight today. Setup shows your progress so far: pounds and percent lost, and your weekly average.
+- **Earlier modules** can be marked complete automatically. You can still open and review every one of them.
+- **Past weigh-ins** from your MOVE! visits can be added in **Progress → Weigh-in history**, so the weight chart shows your whole journey.
+- **Past weekly check-ins** can be filled in by picking the week in the check-in form.
+- **Past days' food and activity** can be logged using the back arrow on the Log tab.
+- **Already set up as new?** Go to **More → Edit my plan, week & start date** and switch to *Already enrolled*. A prompt on the Today screen does the same.
 
 ### Plan setup
 - Enter your current weight and pick a goal of 5%, 7%, 8% or 10%.
@@ -37,16 +48,19 @@ It also lets you:
 - **Water and weight**, for any past day.
 
 ### Program
+- Each module is labeled by week. **You're here** marks your current week and **Review** marks earlier ones.
+- **Go to my week** jumps straight to your current module. Inside a module, use **‹ Week / My week / Week ›** to move between weeks.
+- A **Mark weeks complete** button catches up earlier modules in one tap.
 - All 16 modules plus 3 mini-modules: Weight and Sleep, Quit Tobacco, and Be Involved in Your Health Care.
 - Each module has plain-language key points and a "Bring it home this week" checklist.
 - Each module links to the tools it uses.
 - One module is suggested per program week. You can open any module at any time to match your MOVE! group.
 
-### Toolbox (25 tools)
+### Toolbox (26 tools)
 
 | Area | Tools |
 |---|---|
-| Goals | Weight Loss by the Numbers, SMART Goal Builder, My Reasons, My Rewards, Weekly Check-In |
+| Goals | Weight Loss by the Numbers, SMART Goal Builder, My Reasons, My Rewards, Weekly Check-In (any week), My Weigh-In History |
 | Eating | Rethink Your Drink, Healthy Food Swaps, Rate My Plate, Size It Up! Portion Guide, Food Label Check, Meal Plan & Shopping List, Safe Cooking Temps, Dining Out Checklist |
 | Activity | Calories Burned in 10 Minutes, Target Heart Rate, Effort Scale (RPE), Step Goal Builder |
 | Mind & behavior | Rethink a Thought (4 steps), My Eating Triggers, Craving Timer (15 min), Calm Breathing, Stress Tracker, 5-Step Problem Solver, My Slip Plan |
@@ -122,6 +136,7 @@ Program content is adapted and summarized from:
 
 | Version | Date | Notes |
 |---|---|---|
+| 1.1.0 | 2026-10-12 | Support for Veterans already enrolled: start at any week, set program start date and starting weight, auto-complete earlier modules, Weigh-In History for past weigh-ins, check-ins for past weeks, week labels and review navigation in Program, start date and weekly average on Progress. |
 | 1.0.0 | 2026-10-12 | First release: plan setup, Today dashboard, food, activity, water and weight logs, 16 modules + 3 mini-modules, 25 tools, weekly check-in, progress charts, offline PWA, backup and restore. |
 
 ---

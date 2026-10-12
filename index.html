@@ -139,7 +139,7 @@ canvas{width:100%;height:220px;display:block}
 (function () {
 'use strict';
 
-var VERSION = '1.0.0';
+var VERSION = '1.1.0';
 var KEY = 'mymove.v1';
 
 /* ---------- Program content (adapted from the MOVE! Veteran Workbook, 2023) ---------- */
@@ -247,7 +247,7 @@ var TOOLS = {
  triggers:'My Eating Triggers', plan:'Meal Plan & Shopping List', label:'Food Label Check', temps:'Safe Cooking Temps',
  problem:'5-Step Problem Solver', steps:'Step Goal Builder', craving:'Craving Timer', slip:'My Slip Plan',
  dining:'Dining Out Checklist', breathe:'Calm Breathing', stress:'Stress Tracker', toolkit:'My Toolkit Review',
- care:'Questions for My Care Team', checkin:'Weekly Check-In'
+ care:'Questions for My Care Team', checkin:'Weekly Check-In', weights:'My Weigh-In History'
 };
 
 var DRINKS = [['Fruit punch',320,192],['100% apple juice',300,180],['100% orange juice',280,168],['Lemonade',280,168],['Regular lemon-lime soda',247,148],['Regular cola',227,136],['Sweetened iced tea',225,135],['Tonic water',207,124],['Regular ginger ale',207,124],['Sports drink',165,99],['Fitness water',36,18],['Unsweetened iced tea',3,2],['Sparkling water (unsweetened)',0,0],['Water',0,0]];
@@ -356,18 +356,29 @@ function render() {
 
 /* ---------- Setup / My Plan ---------- */
 function viewSetup(first) {
-  var p = S.profile || {name: '', sex: 'M', startWeight: '', heightIn: '', goalPct: 5, rate: 1, cal: 0, importance: 7, confidence: 7, reasons: '', concerns: ''};
+  var p = S.profile || {name: '', sex: 'M', startWeight: '', heightIn: '', goalPct: 5, rate: 1, cal: 0, importance: 7, confidence: 7, reasons: '', concerns: '', enrolled: false, startDate: today()};
+  var enr = !!p.enrolled, wk = S.profile ? weekNo() : 1, nowWt = S.profile ? currentWeight() : '';
   var h = '';
   if (first) {
-    h += '<div class="card navy"><h1>Welcome to MyMOVE!</h1><p>Your pocket partner for the VA MOVE! Weight Management Program. MyMOVE! follows the MOVE! Veteran Workbook one week at a time: set SMART goals, log food and activity, learn a module, check in, repeat.</p><p class="muted small">Your information stays on this device. Nothing is sent anywhere.</p></div>';
-    h += '<div class="card gold small"><b>Important:</b> MyMOVE! is an independent companion tool. It is not made, endorsed, or reviewed by the U.S. Department of Veterans Affairs, and it doesn\u2019t replace your MOVE! care team or your doctor. Talk with your care team before changing how you eat or how active you are.</div>';
+    h += '<div class="card navy"><h1>Welcome to MyMOVE!</h1><p>Your pocket partner for the VA MOVE! Weight Management Program. MyMOVE! follows the MOVE! Veteran Workbook one week at a time: set SMART goals, log food and activity, learn a module, check in, repeat.</p><p class="muted small">Already in MOVE!? Choose <b>Already enrolled</b> below to pick up at your current week and keep your progress so far. Your information stays on this device. Nothing is sent anywhere.</p></div>';
+    h += '<div class="card gold small"><b>Important:</b> MyMOVE! is an independent companion tool. It is not made, endorsed, or reviewed by the U.S. Department of Veterans Affairs, and it doesn’t replace your MOVE! care team or your doctor. Talk with your care team before changing how you eat or how active you are.</div>';
   }
-  h += '<form data-form="setup" class="card"><h2>1. About you</h2>';
+  h += '<form data-form="setup" class="card"><h2>1. Where are you in MOVE!?</h2>';
+  h += '<div class="seg"><button type="button" id="s_m_new" class="' + (enr ? '' : 'on') + '" data-act="setMode" data-v="new">' + (first ? 'Just starting' : 'Started with the app') + '</button><button type="button" id="s_m_enr" class="' + (enr ? 'on' : '') + '" data-act="setMode" data-v="enrolled">Already enrolled</button></div>';
+  h += '<input type="hidden" id="s_mode" value="' + (enr ? 'enrolled' : 'new') + '">';
+  h += '<div id="s_enr" class="' + (enr ? '' : 'hidden') + '"><div class="grid2"><div><label for="s_week">I’m on week</label><input type="number" inputmode="numeric" id="s_week" min="1" max="104" value="' + wk + '"></div>';
+  h += '<div><label for="s_start">Program start date</label><input type="date" id="s_start" max="' + today() + '" value="' + esc(p.startDate) + '"></div></div>';
+  h += '<p class="muted small">Fill in either one and the other updates. Your week 1 began on your start date (or your first MOVE! session).</p>';
+  if (first) { h += '<label class="check"><input type="checkbox" id="s_catch" checked> <span>Mark the modules before my current week as complete. I can still open and review them anytime.</span></label>'; }
+  h += '</div>';
+  h += '<h2 style="margin-top:18px">2. About you</h2>';
   h += '<label for="s_name">First name or call sign</label><input type="text" id="s_name" value="' + esc(p.name) + '" autocomplete="given-name">';
-  h += '<label for="s_sex">Calorie guide for</label><select id="s_sex"><option value="M"' + (p.sex === 'M' ? ' selected' : '') + '>Men (1,500\u20131,800 a day)</option><option value="F"' + (p.sex === 'F' ? ' selected' : '') + '>Women (1,200\u20131,500 a day)</option></select>';
-  h += '<div class="grid2"><div><label for="s_wt">Current weight (lb)</label><input type="number" inputmode="decimal" id="s_wt" min="80" max="700" step="0.1" value="' + esc(p.startWeight) + '" required></div>';
-  h += '<div><label for="s_ht">Height (inches, optional)</label><input type="number" inputmode="decimal" id="s_ht" min="48" max="90" value="' + esc(p.heightIn) + '"></div></div>';
-  h += '<h2 style="margin-top:18px">2. Weight-loss goal</h2><p class="muted">MOVE! recommends starting with 5% to 10% of your current weight. Even 5% improves your health.</p>';
+  h += '<label for="s_sex">Calorie guide for</label><select id="s_sex"><option value="M"' + (p.sex === 'M' ? ' selected' : '') + '>Men (1,500–1,800 a day)</option><option value="F"' + (p.sex === 'F' ? ' selected' : '') + '>Women (1,200–1,500 a day)</option></select>';
+  h += '<div class="grid2"><div><label for="s_wt" id="s_wtl">' + (enr ? 'Starting weight (lb)' : (first ? 'Current weight (lb)' : 'Starting weight (lb)')) + '</label><input type="number" inputmode="decimal" id="s_wt" min="80" max="700" step="0.1" value="' + esc(p.startWeight) + '" required></div>';
+  h += '<div id="s_nowbox" class="' + (enr ? '' : 'hidden') + '"><label for="s_now">Weight today (lb)</label><input type="number" inputmode="decimal" id="s_now" min="80" max="700" step="0.1" value="' + esc(enr ? nowWt : '') + '" placeholder="optional"></div></div>';
+  h += '<label for="s_ht">Height (inches, optional)</label><input type="number" inputmode="decimal" id="s_ht" min="48" max="90" value="' + esc(p.heightIn) + '">';
+  h += '<p class="muted small" id="s_wthint">' + (enr ? 'Starting weight = what you weighed when you started MOVE!. You can add weigh-ins in between from the Progress tab.' : '') + '</p>';
+  h += '<h2 style="margin-top:18px">3. Weight-loss goal</h2><p class="muted">MOVE! recommends starting with 5% to 10% of your starting weight. Even 5% improves your health.</p>';
   h += '<label for="s_pct">Goal</label><select id="s_pct">';
   var pcts = [5, 7, 8, 10], i;
   for (i = 0; i < pcts.length; i++) { h += '<option value="' + pcts[i] + '"' + (num(p.goalPct) === pcts[i] ? ' selected' : '') + '>Lose ' + pcts[i] + '% of my weight</option>'; }
@@ -375,52 +386,99 @@ function viewSetup(first) {
   var rates = [0.5, 1, 1.5, 2];
   for (i = 0; i < rates.length; i++) { h += '<option value="' + rates[i] + '"' + (num(p.rate) === rates[i] ? ' selected' : '') + '>' + rates[i] + ' lb per week</option>'; }
   h += '</select><div id="s_calc" class="card gold" style="margin:12px 0 0"></div>';
-  h += '<h2 style="margin-top:18px">3. Daily calorie target</h2><p class="muted">Aim for a deficit of about 500 calories a day, and get there gradually. If your MOVE! team gave you a number, use theirs.</p>';
+  h += '<h2 style="margin-top:18px">4. Daily calorie target</h2><p class="muted">Aim for a deficit of about 500 calories a day, and get there gradually. If your MOVE! team gave you a number, use theirs.</p>';
   h += '<label for="s_cal">Calories per day</label><input type="number" inputmode="numeric" id="s_cal" min="1200" max="3500" step="50" value="' + esc(p.cal || '') + '" placeholder="e.g. 1650">';
   h += '<p class="muted small" id="s_calhint"></p>';
-  h += '<h2 style="margin-top:18px">4. Readiness</h2>';
+  h += '<h2 style="margin-top:18px">5. Readiness</h2>';
   h += '<label for="s_imp">How important is managing your weight right now? <span id="s_impv">' + p.importance + '</span>/10</label><input type="range" id="s_imp" min="0" max="10" value="' + p.importance + '">';
   h += '<label for="s_conf">How confident are you about making changes? <span id="s_confv">' + p.confidence + '</span>/10</label><input type="range" id="s_conf" min="0" max="10" value="' + p.confidence + '">';
   h += '<label for="s_reasons">My reasons to MOVE! (what matters most to me)</label><textarea id="s_reasons" placeholder="Keep up with my grandkids. Get off blood pressure meds. Hike again.">' + esc(p.reasons) + '</textarea>';
-  h += '<label for="s_concerns">My concerns about starting</label><textarea id="s_concerns" placeholder="Time, cost, knee pain...">' + esc(p.concerns) + '</textarea>';
-  h += '<p class="muted small">More reasons than concerns? You\u2019re ready. More concerns? Bring them to your MOVE! team; they can help.</p>';
+  h += '<label for="s_concerns">My concerns</label><textarea id="s_concerns" placeholder="Time, cost, knee pain...">' + esc(p.concerns) + '</textarea>';
+  h += '<p class="muted small">More reasons than concerns? You’re ready. More concerns? Bring them to your MOVE! team; they can help.</p>';
   h += '<button class="btn gold block" type="submit" style="margin-top:12px">' + (first ? 'Start my MOVE!' : 'Save my plan') + '</button></form>';
   return h;
 }
-function afterSetup() {
-  var ids = ['s_wt', 's_pct', 's_rate', 's_sex', 's_cal', 's_imp', 's_conf'], i;
-  for (i = 0; i < ids.length; i++) { var el = $(ids[i]); if (el) { el.oninput = setupCalc; el.onchange = setupCalc; } }
+ACT.setMode = function (v) {
+  var enr = v === 'enrolled', first = !S.profile;
+  $('s_mode').value = v;
+  $('s_m_new').className = enr ? '' : 'on'; $('s_m_enr').className = enr ? 'on' : '';
+  $('s_enr').className = enr ? '' : 'hidden'; $('s_nowbox').className = enr ? '' : 'hidden';
+  $('s_wtl').textContent = enr || !first ? 'Starting weight (lb)' : 'Current weight (lb)';
+  $('s_wthint').textContent = enr ? 'Starting weight = what you weighed when you started MOVE!. You can add weigh-ins in between from the Progress tab.' : '';
   setupCalc();
+};
+function startFromWeek(w) { w = Math.max(1, Math.round(w)); return addDays(today(), -(w - 1) * 7); }
+function weekFromStart(s) { var d = daysBetween(s, today()); return d < 0 ? 1 : Math.floor(d / 7) + 1; }
+function afterSetup() {
+  var ids = ['s_wt', 's_now', 's_pct', 's_rate', 's_sex', 's_cal', 's_imp', 's_conf'], i;
+  for (i = 0; i < ids.length; i++) { var el = $(ids[i]); if (el) { el.oninput = setupCalc; el.onchange = setupCalc; } }
+  $('s_week').oninput = function () { var w = num(this.value); if (w >= 1) { $('s_start').value = startFromWeek(w); } setupCalc(); };
+  $('s_start').onchange = function () { if (this.value) { if (this.value > today()) { this.value = today(); } $('s_week').value = weekFromStart(this.value); } setupCalc(); };
+  setupCalc();
+}
+function setupStart() {
+  if (val('s_mode') === 'enrolled' && val('s_start')) { return val('s_start'); }
+  return S.profile ? S.profile.startDate : today();
 }
 function setupCalc() {
   var box = $('s_calc'); if (!box) { return; }
-  var wt = num(val('s_wt')), pc = num(val('s_pct')), rate = num(val('s_rate')), sex = val('s_sex');
+  var wt = num(val('s_wt')), pc = num(val('s_pct')), rate = num(val('s_rate')), sex = val('s_sex'), enr = val('s_mode') === 'enrolled';
   $('s_impv').textContent = val('s_imp'); $('s_confv').textContent = val('s_conf');
   var lo = sex === 'F' ? 1200 : 1500, hi = sex === 'F' ? 1500 : 1800;
-  $('s_calhint').textContent = 'MOVE! general range for ' + (sex === 'F' ? 'women' : 'men') + ': ' + commas(lo) + '\u2013' + commas(hi) + ' calories a day. Leave blank to use ' + commas(hi) + ' to start.';
+  $('s_calhint').textContent = 'MOVE! general range for ' + (sex === 'F' ? 'women' : 'men') + ': ' + commas(lo) + '–' + commas(hi) + ' calories a day. Leave blank to use ' + commas(hi) + ' to start.';
   if (!wt) { box.innerHTML = 'Enter your weight to see your numbers.'; return; }
-  var lbs = Math.round(wt * pc / 100), wks = Math.ceil(lbs / rate);
-  var start = S.profile ? S.profile.startDate : today();
-  box.innerHTML = '<b>Your target:</b> lose <b>' + lbs + ' lb</b> (' + pc + '%), from ' + r1(wt) + ' to <b>' + r1(wt - lbs) + ' lb</b>.<br>At ' + rate + ' lb a week that\u2019s about <b>' + wks + ' weeks</b>, around <b>' + fmtLong(addDays(start, wks * 7)) + '</b>.<br><span class="small">5% = ' + Math.round(wt * 0.05) + ' lb \u00b7 8% = ' + Math.round(wt * 0.08) + ' lb \u00b7 10% = ' + Math.round(wt * 0.1) + ' lb</span>';
+  var lbs = Math.round(wt * pc / 100), wks = Math.ceil(lbs / rate), start = setupStart();
+  var h = '<b>Your target:</b> lose <b>' + lbs + ' lb</b> (' + pc + '%), from ' + r1(wt) + ' to <b>' + r1(wt - lbs) + ' lb</b>.<br>At ' + rate + ' lb a week that’s about <b>' + wks + ' weeks</b> from ' + (start === today() ? 'today' : fmtLong(start)) + ', around <b>' + fmtLong(addDays(start, wks * 7)) + '</b>.<br><span class="small">5% = ' + Math.round(wt * 0.05) + ' lb · 8% = ' + Math.round(wt * 0.08) + ' lb · 10% = ' + Math.round(wt * 0.1) + ' lb</span>';
+  var now = num(val('s_now'));
+  if (enr && now >= 80 && start < today()) {
+    var lost = r1(wt - now), weeks = Math.max(1, daysBetween(start, today()) / 7);
+    h += '<hr style="border:0;border-top:1px solid #f2d27a;margin:10px 0"><b>Your progress so far:</b> ' + (lost > 0 ? '<b>' + lost + ' lb</b> lost (' + r1(lost / wt * 100) + '%) in ' + Math.floor(weeks) + ' week' + (Math.floor(weeks) === 1 ? '' : 's') + ', about ' + r1(lost / weeks) + ' lb a week.' + (lost >= lbs ? ' You’ve already reached this goal! Consider the next one.' : ' ' + r1(lbs - lost) + ' lb to go.') : 'no loss yet. That’s okay; keep going.');
+  }
+  box.innerHTML = h;
+}
+function upsertWeight(d, lb) {
+  var i;
+  for (i = 0; i < S.weights.length; i++) { if (S.weights[i].date === d) { S.weights[i].lb = lb; return; } }
+  S.weights.push({date: d, lb: lb});
 }
 function submitSetup() {
-  var wt = num(val('s_wt'));
-  if (wt < 80 || wt > 700) { toast('Please enter your current weight'); return; }
+  var wt = r1(num(val('s_wt')));
+  if (wt < 80 || wt > 700) { toast('Please enter your starting weight'); return; }
+  var enr = val('s_mode') === 'enrolled', first = !S.profile;
+  var start = first ? today() : S.profile.startDate;
+  if (enr) {
+    start = val('s_start');
+    if (!start || start > today()) { toast('Pick a start date of today or earlier'); return; }
+  }
+  var nowRaw = val('s_now'), now = r1(num(nowRaw));
+  if (enr && nowRaw !== '' && (now < 80 || now > 700)) { toast('Check your weight today'); return; }
   var sex = val('s_sex'), cal = Math.round(num(val('s_cal')));
   if (!cal) { cal = sex === 'F' ? 1500 : 1800; }
   if (cal < 1200) { cal = 1200; toast('Set to 1,200, the lowest the program uses'); }
-  var first = !S.profile;
-  var p = S.profile || {startDate: today()};
+  var p = S.profile || {};
+  var oldStart = p.startDate, oldWt = p.startWeight, i;
   p.name = val('s_name').replace(/^\s+|\s+$/g, ''); p.sex = sex; p.heightIn = num(val('s_ht')) || '';
   p.goalPct = num(val('s_pct')); p.rate = num(val('s_rate')); p.cal = cal;
   p.importance = num(val('s_imp')); p.confidence = num(val('s_conf'));
   p.reasons = val('s_reasons'); p.concerns = val('s_concerns');
-  if (first) { p.startWeight = wt; S.weights.push({date: today(), lb: wt}); }
-  else { p.startWeight = wt; }
-  S.profile = p; save();
-  closeSheet(true);
-  toast(first ? 'Your plan is set. Let\u2019s MOVE!' : 'Plan saved');
-  if (first) { S.ui.tab = 'today'; setTab('today'); openModule(1); } else { render(); }
+  p.enrolled = enr; p.startDate = start; p.startWeight = wt;
+  if (oldStart && oldStart !== start) {
+    for (i = S.weights.length - 1; i >= 0; i--) { if (S.weights[i].date === oldStart && S.weights[i].lb === oldWt) { S.weights.splice(i, 1); } }
+  }
+  for (i = S.weights.length - 1; i >= 0; i--) { if (S.weights[i].date < start) { S.weights.splice(i, 1); } }
+  upsertWeight(start, wt);
+  if (enr && now >= 80) { upsertWeight(today(), now); }
+  S.profile = p;
+  var w = weekNo();
+  if (first && enr && checked('s_catch')) {
+    for (i = 1; i < w && i <= 16; i++) { if (!S.mods[i]) { S.mods[i] = {todo: {}}; } S.mods[i].done = true; }
+  }
+  save();
+  closeSheet(false);
+  if (first) {
+    toast(enr ? 'Welcome aboard. Picking up at week ' + w + '.' : 'Your plan is set. Let’s MOVE!');
+    S.ui.tab = 'today'; setTab('today'); openModule(w > 16 ? 16 : w);
+  } else { toast('Plan saved' + (enr ? ' · week ' + w : '')); render(); }
 }
 
 /* ---------- Today ---------- */
@@ -445,6 +503,12 @@ function viewToday() {
   h += '<div class="row" style="margin-top:8px"><button class="btn ghost sm" data-act="water" data-v="-1">\u2212 1 cup</button><button class="btn sm" data-act="water" data-v="1">+ 1 cup</button></div></div>';
   h += '<div class="card"><div class="row between"><h2 style="margin:0">This week\u2019s SMART goals</h2><button class="btn ghost sm" data-act="tool" data-v="smart">' + (g.eat || g.act ? 'Edit' : 'Set') + '</button></div>';
   h += goalRow('eat', 'Healthy eating', g, w) + goalRow('act', 'Physical activity', g, w) + '</div>';
+  if (p.enrolled && w > 1 && sortedWeights().length < 3 && !S.ui.hideJourney) {
+    h += '<div class="card gold"><b>Fill in your journey so far.</b> You started on ' + fmtLong(p.startDate) + '. Add weigh-ins from your MOVE! visits so your chart shows your whole story.<div class="row wrap" style="margin-top:8px"><button class="btn sm" data-act="tool" data-v="weights">Add past weigh-ins</button><button class="btn ghost sm" data-act="hideTip" data-v="hideJourney">Not now</button></div></div>';
+  }
+  if (!p.enrolled && w === 1 && !S.ui.hideEnroll) {
+    h += '<div class="card"><b>Already in the MOVE! program?</b> Set your current week and starting weight so you don’t start over.<div class="row wrap" style="margin-top:8px"><button class="btn sm" data-act="editPlan" data-v="enrolled">I’m already enrolled</button><button class="btn ghost sm" data-act="hideTip" data-v="hideEnroll">I’m new</button></div></div>';
+  }
   var lw = lastWeighDate();
   if (!lw || daysBetween(lw, t) >= 7) {
     h += '<div class="card gold"><b>Time to weigh in.</b> ' + (lw ? 'Last weigh-in was ' + daysBetween(lw, t) + ' days ago.' : '') + ' MOVE! recommends weighing in at least weekly.<div style="margin-top:8px"><button class="btn sm" data-act="addWeight">Log weight</button></div></div>';
@@ -593,8 +657,8 @@ function submitWeight() {
   var d = val('w_date') || today(), lb = r1(num(val('w_lb')));
   if (lb < 80 || lb > 700) { toast('Enter a valid weight'); return; }
   var i, found = false;
-  for (i = 0; i < S.weights.length; i++) { if (S.weights[i].date === d) { S.weights[i].lb = lb; found = true; } }
-  if (!found) { S.weights.push({date: d, lb: lb}); }
+  if (d < S.profile.startDate) { toast('That\u2019s before your start date. Change it in My plan first.'); return; }
+  upsertWeight(d, lb); if (d === S.profile.startDate) { S.profile.startWeight = lb; }
   save(); closeSheet(true);
   var lost = r1(S.profile.startWeight - lb), p5 = Math.round(S.profile.startWeight * 0.05);
   toast(lost > 0 ? (lost >= p5 ? '5% milestone reached! ' : '') + 'Down ' + lost + ' lb since you started' : 'Weight logged. Keep going.');
@@ -607,7 +671,10 @@ ACT.goalDay = function (v) { var p = v.split('|'), g = getGoals(weekNo()), key =
 function viewProgram() {
   var w = weekNo(), done = 0, i, h = '';
   for (i = 1; i <= 16; i++) { if (S.mods[i] && S.mods[i].done) { done++; } }
-  h += '<h1>The MOVE! Program</h1><div class="card"><div class="row between"><b>' + done + ' of 16 modules complete</b><span class="pill">Week ' + w + '</span></div>' + barHtml(done, 16) + '<p class="muted small" style="margin:6px 0 0">MyMOVE! suggests one module a week, the same order as the Veteran Workbook. If your MOVE! group is on a different module, just open that one.</p></div>';
+  var cm = w > 16 ? 16 : w, behind = 0;
+  for (i = 1; i < cm; i++) { if (!(S.mods[i] && S.mods[i].done)) { behind++; } }
+  h += '<h1>The MOVE! Program</h1><div class="card"><div class="row between"><b>' + done + ' of 16 modules complete</b><span class="pill">Week ' + w + '</span></div>' + barHtml(done, 16) + '<p class="muted small" style="margin:6px 0 10px">One module a week, in Veteran Workbook order. Pick up at your week, and tap any earlier week to review its lesson. On a different week than your MOVE! group? <a href="#" data-act="editPlan">Change my week</a>.</p>';
+  h += '<div class="row wrap"><button class="btn gold sm" data-act="module" data-v="' + cm + '">Go to my week: Module ' + cm + '</button>' + (behind ? '<button class="btn ghost sm" data-act="catchUp">' + (cm === 2 ? 'Mark week 1 complete' : 'Mark weeks 1\u2013' + (cm - 1) + ' complete') + '</button>' : '') + '</div></div>';
   h += '<div class="card">';
   for (i = 0; i < MODULES.length; i++) { h += modRow(MODULES[i], w); }
   h += '</div><h2>Mini-modules</h2><div class="card">';
@@ -622,12 +689,18 @@ function modRow(md, w) {
   var st = S.mods[md.n] || {}, cls = 'mod' + (st.done ? ' done' : (md.n === (w > 16 ? 16 : w) ? ' now' : ''));
   var todo = st.todo || {}, c = 0, i;
   for (i = 0; i < md.todo.length; i++) { if (todo[i]) { c++; } }
-  return '<div class="' + cls + '" data-act="module" data-v="' + md.n + '"><div class="num">' + (st.done ? '\u2713' : md.n) + '</div><div class="grow"><div class="t">' + esc(md.t) + '</div><div class="s">' + esc(md.s) + ' \u00b7 ' + c + '/' + md.todo.length + ' to-dos</div></div><div class="muted">\u203a</div></div>';
+  var isNum = typeof md.n === 'number', cur = w > 16 ? 16 : w;
+  var tag = isNum ? (md.n === cur ? ' <span class="pill gold">You\u2019re here</span>' : (md.n < cur ? ' <span class="pill">Review</span>' : '')) : '';
+  return '<div class="' + cls + '" data-act="module" data-v="' + md.n + '"><div class="num">' + (st.done ? '\u2713' : md.n) + '</div><div class="grow"><div class="t">' + (isNum ? '<span class="muted small">Week ' + md.n + '</span> ' : '') + esc(md.t) + tag + '</div><div class="s">' + esc(md.s) + ' \u00b7 ' + c + '/' + md.todo.length + ' to-dos</div></div><div class="muted">\u203a</div></div>';
 }
 function findMod(n) { var i, all = MODULES.concat(MINIS); for (i = 0; i < all.length; i++) { if (String(all[i].n) === String(n)) { return all[i]; } } return null; }
 function openModule(n) {
   var md = findMod(n); if (!md) { return; }
-  var st = S.mods[md.n] || {todo: {}}, i, h = '';
+  var st = S.mods[md.n] || {todo: {}}, i, h = '', isNum = typeof md.n === 'number', w = weekNo(), cur = w > 16 ? 16 : w;
+  if (isNum) {
+    var note = md.n === cur ? 'This is your week.' : (md.n < cur ? 'Reviewing an earlier week. Revisit anything that\u2019s slipped.' : 'Coming up in week ' + md.n + '. Feel free to read ahead.');
+    h += '<div class="row between" style="margin-bottom:10px"><span class="pill ' + (md.n === cur ? 'gold' : '') + '">Week ' + md.n + ' of 16</span><span class="muted small">' + note + '</span></div>';
+  }
   h += '<div class="card navy"><p style="margin:0">' + esc(md.why) + '</p></div>';
   h += '<div class="card"><h2>Key points</h2><ul class="pts">';
   for (i = 0; i < md.pts.length; i++) { h += '<li>' + esc(md.pts[i]) + '</li>'; }
@@ -641,10 +714,15 @@ function openModule(n) {
     h += '</div>';
   }
   h += '<button class="btn ' + (st.done ? 'ghost' : 'gold') + ' block" data-act="modDone" data-v="' + md.n + '">' + (st.done ? 'Mark as not complete' : 'Mark module complete') + '</button>';
+  if (isNum) {
+    h += '<div class="row" style="margin-top:12px">' + (md.n > 1 ? '<button class="btn ghost grow" data-act="module" data-v="' + (md.n - 1) + '">\u2039 Week ' + (md.n - 1) + '</button>' : '') + (md.n !== cur ? '<button class="btn ghost grow" data-act="module" data-v="' + cur + '">My week</button>' : '') + (md.n < 16 ? '<button class="btn ghost grow" data-act="module" data-v="' + (md.n + 1) + '">Week ' + (md.n + 1) + ' \u203a</button>' : '') + '</div>';
+  }
   h += '<p class="foot">Want the full lesson? Use your printed MOVE! Veteran Workbook or the PDF on move.va.gov.</p>';
   openSheet((typeof md.n === 'number' ? 'Module ' + md.n + ': ' : '') + md.t, h);
 }
 ACT.module = function (v) { openModule(v); };
+ACT.catchUp = function () { var cm = Math.min(weekNo(), 16), i; for (i = 1; i < cm; i++) { if (!S.mods[i]) { S.mods[i] = {todo: {}}; } S.mods[i].done = true; } save(); render(); toast('Weeks 1\u2013' + (cm - 1) + ' marked complete'); };
+ACT.hideTip = function (v) { S.ui[v] = true; save(); render(); };
 ACT.modTodo = function (v, el) { var p = v.split('|'); if (!S.mods[p[0]]) { S.mods[p[0]] = {todo: {}}; } if (!S.mods[p[0]].todo) { S.mods[p[0]].todo = {}; } S.mods[p[0]].todo[p[1]] = el.checked; save(); };
 ACT.modDone = function (v) { if (!S.mods[v]) { S.mods[v] = {todo: {}}; } S.mods[v].done = !S.mods[v].done; save(); toast(S.mods[v].done ? 'Module complete. Well done!' : 'Marked not complete'); openModule(v); };
 
@@ -656,8 +734,9 @@ function viewProgress() {
   h += '<p style="margin:12px 0 2px"><b>' + (lost > 0 ? lost + ' lb lost (' + lostPct + '%)' : 'Let\u2019s get the first pound') + '</b> of your ' + gl + ' lb goal</p>' + barHtml(lost, gl);
   var m5 = Math.round(p.startWeight * 0.05), m10 = Math.round(p.startWeight * 0.1);
   h += '<div class="row wrap" style="margin-top:6px"><span class="pill' + (lost >= m5 ? ' green' : '') + '">5% = ' + m5 + ' lb ' + (lost >= m5 ? '\u2713' : '') + '</span><span class="pill' + (lost >= Math.round(p.startWeight * 0.08) ? ' green' : '') + '">8% = ' + Math.round(p.startWeight * 0.08) + ' lb</span><span class="pill' + (lost >= m10 ? ' green' : '') + '">10% = ' + m10 + ' lb</span></div>';
-  h += '<p class="muted small" style="margin:8px 0 0">On pace for about ' + fmtLong(targetDate()) + ' at ' + p.rate + ' lb a week.</p></div>';
-  h += '<div class="card"><h2>Weight trend</h2>' + (S.weights.length < 2 ? '<p class="muted">Log at least two weigh-ins to see your trend.</p>' : '<canvas id="wchart" aria-label="Weight chart"></canvas><p class="muted small" style="margin:6px 0 0">Gold line: your goal weight.</p>') + '</div>';
+  var wksIn = daysBetween(p.startDate, today()) / 7;
+  h += '<p class="muted small" style="margin:8px 0 0">Started ' + fmtLong(p.startDate) + ' (week ' + weekNo() + ')' + (lost > 0 && wksIn >= 1 ? ' \u00b7 averaging ' + r1(lost / wksIn) + ' lb a week' : '') + '. Goal pace: ' + p.rate + ' lb a week, about ' + fmtLong(targetDate()) + '.</p></div>';
+  h += '<div class="card"><h2>Weight trend</h2>' + (S.weights.length < 2 ? '<p class="muted">Log at least two weigh-ins to see your trend. Already in MOVE!? Add your past weigh-ins.</p>' : '<canvas id="wchart" aria-label="Weight chart"></canvas><p class="muted small" style="margin:6px 0 0">Gold line: your goal weight.</p>') + '<button class="btn ghost sm" style="margin-top:10px" data-act="tool" data-v="weights">Weigh-in history \u00b7 add past weigh-ins</button></div>';
   h += '<div class="card"><h2>Active minutes by week</h2><canvas id="achart" aria-label="Activity chart"></canvas><p class="muted small" style="margin:6px 0 0">Moderate-equivalent minutes. Lines at 150 and 300.</p></div>';
   var lg = loggedDays(7);
   h += '<div class="card"><h2>Habits</h2><div class="grid3"><div class="stat"><b>' + streak() + '</b><span>day log streak</span></div><div class="stat"><b>' + lg + '/7</b><span>days logged</span></div><div class="stat"><b>' + S.checkins.length + '</b><span>check-ins</span></div></div></div>';
@@ -669,7 +748,7 @@ function viewProgress() {
   }
   if (S.checkins.length) {
     h += '<div class="card"><h2>Check-in history</h2><div class="list">';
-    var c = S.checkins.slice().reverse(), j;
+    var c = S.checkins.slice().sort(function (a, b) { return b.week - a.week || (a.date < b.date ? 1 : -1); }), j;
     for (j = 0; j < c.length && j < 8; j++) { h += '<div class="item"><div class="grow"><b>Week ' + c[j].week + '</b><div class="muted small">' + fmtLong(c[j].date) + ' \u00b7 eating goal: ' + esc(c[j].eatMet) + ' \u00b7 activity goal: ' + esc(c[j].actMet) + '</div>' + (c[j].wins ? '<div class="small">Win: ' + esc(c[j].wins) + '</div>' : '') + '</div><b>' + (c[j].lb ? c[j].lb + ' lb' : '') + '</b></div>'; }
     h += '</div></div>';
   }
@@ -723,7 +802,7 @@ function drawCharts() {
 /* ---------- More ---------- */
 function viewMore() {
   var h = '<h1>More</h1>';
-  h += '<div class="card"><button class="btn gold block" data-act="tool" data-v="checkin">Weekly check-in</button><div style="height:8px"></div><button class="btn ghost block" data-act="editPlan">Edit my plan & goals</button><div style="height:8px"></div><button class="btn ghost block" data-act="tool" data-v="rewards">My rewards</button></div>';
+  h += '<div class="card"><button class="btn gold block" data-act="tool" data-v="checkin">Weekly check-in</button><div style="height:8px"></div><button class="btn ghost block" data-act="editPlan">Edit my plan, week & start date</button><div style="height:8px"></div><button class="btn ghost block" data-act="tool" data-v="weights">Weigh-in history</button><div style="height:8px"></div><button class="btn ghost block" data-act="tool" data-v="rewards">My rewards</button></div>';
   h += '<div class="card"><h2>Getting started with VA MOVE!</h2><ol class="pts" style="padding-left:4px"><li>Contact your VA MOVE! Program, or tell your VA Primary Care team you\u2019re interested.</li><li>Complete the MOVE!11 Getting Started Questionnaire, online or at your VA.</li><li>Review your MOVE!11 report with your MOVE! team to set first goals.</li><li>Choose a MOVE! option with your team: group sessions, individual sessions, TeleMOVE!, the MOVE! Coach app, or medication and surgery options where appropriate.</li></ol>';
   h += '<p class="small">Not getting care at VA? The Veteran Workbook and MOVE! Coach app are open to anyone.</p>';
   h += '<p><a href="https://www.move.va.gov" target="_blank" rel="noopener">move.va.gov</a> \u00b7 <a href="https://www.move.va.gov/MOVE/GetStarted.asp" target="_blank" rel="noopener">Get Started</a> \u00b7 <a href="https://www.move.va.gov/docs/veteranworkbook/MoveVetWorkBook-2023.pdf" target="_blank" rel="noopener">Veteran Workbook (PDF)</a> \u00b7 <a href="https://www.move.va.gov/SuccessStories/index.asp" target="_blank" rel="noopener">Success Stories</a></p></div>';
@@ -732,7 +811,7 @@ function viewMore() {
   h += '<div class="card small"><h2>About MyMOVE!</h2><p>MyMOVE! v' + VERSION + ' is an independent companion app that organizes the MOVE! Veteran Workbook (2023) into weekly, trackable steps. Program content is adapted from VA\u2019s MOVE! materials. It is not made, endorsed, or reviewed by the U.S. Department of Veterans Affairs and doesn\u2019t give medical advice. Your MOVE! care team and your doctor come first.</p><p style="margin:0">Built by ARTEZIQ.</p></div>';
   return h;
 }
-ACT.editPlan = function () { openSheet('My plan', viewSetup(false)); afterSetup(); };
+ACT.editPlan = function (v) { openSheet('My plan', viewSetup(false)); afterSetup(); if (v === 'enrolled') { ACT.setMode('enrolled'); } };
 ACT.export = function () {
   try {
     var blob = new Blob([JSON.stringify(S, null, 1)], {type: 'application/json'}), a = document.createElement('a');
@@ -752,7 +831,7 @@ ACT.reset = function () { if (window.confirm('Erase all MyMOVE! data on this dev
 
 /* ---------- Tools ---------- */
 var timerH = null, breathH = null;
-function stopTimers() { if (timerH) { clearInterval(timerH); timerH = null; } if (breathH) { clearInterval(breathH); breathH = null; } }
+function stopTimers() { ckWeek = null; pwNext = null; if (timerH) { clearInterval(timerH); timerH = null; } if (breathH) { clearInterval(breathH); breathH = null; } }
 ACT.tool = function (v) {
   var f = TOOLFN[v]; if (!f) { return; }
   var h = f();
@@ -999,26 +1078,63 @@ ACT.kit = function (v, el) { S.toolkit[v] = el.checked; save(); };
 TOOLFN.care = function () { return '<form data-form="care" class="card"><label for="cr_q">Questions and notes for my next visit</label><textarea id="cr_q" style="min-height:180px" placeholder="How do my medicines affect my weight? Is it safe for me to start strength training? What are my latest numbers?">' + esc(S.care) + '</textarea><button class="btn gold block" type="submit" style="margin-top:12px">Save</button></form><div class="card"><button class="btn ghost block" data-act="share">Share my progress summary</button></div>'; };
 function submitCare() { S.care = val('cr_q'); save(); toast('Saved'); }
 
+var ckWeek = null, pwNext = null;
 TOOLFN.checkin = function () {
-  var w = weekNo(), pw = w > 1 ? w - 1 : 1, g = getGoals(pw), h = '<form data-form="checkin">', i;
-  h += '<div class="card"><h2>Progress check-in</h2><p class="muted small">Reflecting on ' + (w > 1 ? 'last week (week ' + pw + ')' : 'this first week') + '.</p>';
-  h += '<label>Did you meet your healthy eating goal?' + (g.eat ? '<br><span class="muted small">\u201c' + esc(g.eat) + '\u201d</span>' : '') + '</label><select id="ck_e"><option>Yes</option><option>Partly</option><option>No</option><option>No goal set</option></select>';
-  h += '<label>Did you meet your physical activity goal?' + (g.act ? '<br><span class="muted small">\u201c' + esc(g.act) + '\u201d</span>' : '') + '</label><select id="ck_a"><option>Yes</option><option>Partly</option><option>No</option><option>No goal set</option></select>';
-  h += '<label for="ck_w">My weight today (lb)</label><input type="number" inputmode="decimal" id="ck_w" step="0.1" value="' + currentWeight() + '">';
-  h += '<label for="ck_win">What successes did you have?</label><textarea id="ck_win"></textarea><label for="ck_ch">What challenges did you run into?</label><textarea id="ck_ch"></textarea><label for="ck_help">What helped, or what will you do differently this week?</label><textarea id="ck_help"></textarea></div>';
+  var w = weekNo(), pw = w > 1 ? w - 1 : 1, wk = ckWeek || pw, g = getGoals(wk), h = '<form data-form="checkin">', i, recent = wk >= pw;
+  var done = {};
+  for (i = 0; i < S.checkins.length; i++) { done[S.checkins[i].week] = true; }
+  h += '<div class="card"><h2>Progress check-in</h2><label for="ck_wk">Which week are you checking in for?</label><select id="ck_wk">';
+  for (i = w; i >= 1; i--) { h += '<option value="' + i + '"' + (i === wk ? ' selected' : '') + '>Week ' + i + (i === w ? ' (this week)' : (i === pw ? ' (last week)' : '')) + (done[i] ? ' ✓' : '') + '</option>'; }
+  h += '</select><p class="muted small">Already in MOVE! for a while? You can fill in earlier weeks from your workbook notes. Skip anything you don’t remember.</p>';
+  h += '<label>Did you meet your healthy eating goal?' + (g.eat ? '<br><span class="muted small">“' + esc(g.eat) + '”</span>' : '') + '</label><select id="ck_e"><option>Yes</option><option>Partly</option><option>No</option><option>No goal set</option><option>Don’t remember</option></select>';
+  h += '<label>Did you meet your physical activity goal?' + (g.act ? '<br><span class="muted small">“' + esc(g.act) + '”</span>' : '') + '</label><select id="ck_a"><option>Yes</option><option>Partly</option><option>No</option><option>No goal set</option><option>Don’t remember</option></select>';
+  h += '<label for="ck_w">' + (recent ? 'My weight today (lb)' : 'My weight at the end of week ' + wk + ' (lb, optional)') + '</label><input type="number" inputmode="decimal" id="ck_w" step="0.1" value="' + (recent ? currentWeight() : '') + '">';
+  h += '<label for="ck_win">What successes did you have?</label><textarea id="ck_win"></textarea><label for="ck_ch">What challenges did you run into?</label><textarea id="ck_ch"></textarea><label for="ck_help">What helped, or what will you do differently?</label><textarea id="ck_help"></textarea></div>';
   h += '<div class="card"><h2>Even small changes make a difference</h2><p class="muted small">What benefits have you noticed?</p>';
   for (i = 0; i < BENEFITS.length; i++) { h += '<label class="check"><input type="checkbox" id="ck_b' + i + '"> <span>' + BENEFITS[i] + '</span></label>'; }
-  h += '</div><button class="btn gold block" type="submit">Save check-in & set this week\u2019s goals</button></form>';
+  h += '</div><button class="btn gold block" type="submit">' + (recent ? 'Save check-in & set this week’s goals' : 'Save week ' + wk + ' check-in') + '</button></form>';
   return h;
 };
+AFTER.checkin = function () { $('ck_wk').onchange = function () { ckWeek = num(this.value); ACT.tool('checkin'); }; };
 function submitCheckin() {
-  var b = [], i, lb = r1(num(val('ck_w')));
+  var b = [], i, lb = r1(num(val('ck_w'))), w = weekNo(), wk = num(val('ck_wk')) || w, recent = wk >= w - 1;
+  var d = recent ? today() : addDays(weekStart(wk), 6);
+  if (d > today()) { d = today(); }
   for (i = 0; i < BENEFITS.length; i++) { if (checked('ck_b' + i)) { b.push(BENEFITS[i]); } }
-  S.checkins.push({date: today(), week: weekNo(), eatMet: val('ck_e'), actMet: val('ck_a'), lb: lb || '', wins: val('ck_win'), chal: val('ck_ch'), help: val('ck_help'), benefits: b});
-  if (lb >= 80) { var found = false; for (i = 0; i < S.weights.length; i++) { if (S.weights[i].date === today()) { S.weights[i].lb = lb; found = true; } } if (!found) { S.weights.push({date: today(), lb: lb}); } }
-  save(); toast('Check-in saved. Now set this week\u2019s goals.');
-  ACT.tool('smart');
+  for (i = S.checkins.length - 1; i >= 0; i--) { if (S.checkins[i].week === wk) { S.checkins.splice(i, 1); } }
+  S.checkins.push({date: d, week: wk, eatMet: val('ck_e'), actMet: val('ck_a'), lb: lb >= 80 ? lb : '', wins: val('ck_win'), chal: val('ck_ch'), help: val('ck_help'), benefits: b});
+  if (lb >= 80) { upsertWeight(d, lb); }
+  save();
+  if (recent) { toast('Check-in saved. Now set this week’s goals.'); ACT.tool('smart'); }
+  else { toast('Week ' + wk + ' saved'); ckWeek = wk > 1 ? wk - 1 : null; ACT.tool('checkin'); }
 }
+
+TOOLFN.weights = function () {
+  var p = S.profile, ws = sortedWeights().reverse(), i, def = pwNext || addDays(today(), -7);
+  if (def < p.startDate) { def = p.startDate; }
+  var h = '<form data-form="pastw" class="card"><p class="muted small">Add weigh-ins from your MOVE! visits or your own scale since you started on <b>' + fmtLong(p.startDate) + '</b>. One a week is plenty. To change your start date or starting weight, use <a href="#" data-act="editPlan">My plan</a>.</p>';
+  h += '<div class="grid2"><div><label for="pw_d">Date</label><input type="date" id="pw_d" min="' + p.startDate + '" max="' + today() + '" value="' + def + '"></div><div><label for="pw_lb">Weight (lb)</label><input type="number" inputmode="decimal" id="pw_lb" step="0.1" min="80" max="700" required></div></div>';
+  h += '<button class="btn gold block" type="submit" style="margin-top:12px">Add weigh-in</button></form>';
+  h += '<div class="card"><h2>History</h2><div class="list">';
+  for (i = 0; i < ws.length; i++) {
+    var isStart = ws[i].date === p.startDate, diff = r1(ws[i].lb - p.startWeight);
+    h += '<div class="item"><div class="grow"><b>' + ws[i].lb + ' lb</b>' + (isStart ? ' <span class="pill gold">Start</span>' : ' <span class="muted small">' + (diff <= 0 ? '−' + Math.abs(diff) : '+' + diff) + ' lb</span>') + '<div class="muted small">' + fmtLong(ws[i].date) + ' · week ' + weekFromStart2(ws[i].date) + '</div></div>' + (isStart ? '' : '<button class="x" data-act="delWeight" data-v="' + ws[i].date + '" aria-label="Delete">✕</button>') + '</div>';
+  }
+  return h + '</div></div>';
+};
+function weekFromStart2(d) { var n = daysBetween(S.profile.startDate, d); return n < 0 ? 1 : Math.floor(n / 7) + 1; }
+function submitPastWeight() {
+  var d = val('pw_d'), lb = r1(num(val('pw_lb')));
+  if (!d || d > today()) { toast('Pick a date of today or earlier'); return; }
+  if (d < S.profile.startDate) { toast('That’s before your start date. Change it in My plan first.'); return; }
+  if (lb < 80 || lb > 700) { toast('Enter a valid weight'); return; }
+  if (d === S.profile.startDate) { S.profile.startWeight = lb; }
+  upsertWeight(d, lb); save();
+  pwNext = addDays(d, -7);
+  toast('Weigh-in added for ' + fmtDate(d));
+  ACT.tool('weights');
+}
+ACT.delWeight = function (d) { var i; for (i = S.weights.length - 1; i >= 0; i--) { if (S.weights[i].date === d) { S.weights.splice(i, 1); } } save(); ACT.tool('weights'); };
 
 /* ---------- Sheet ---------- */
 function openSheet(title, html) { stopTimers(); $('sheettitle').textContent = title; $('sheetbody').innerHTML = html; $('sheetwrap').className = ''; $('sheetbody').scrollTop = 0; document.body.style.overflow = 'hidden'; }
@@ -1055,6 +1171,7 @@ document.addEventListener('submit', function (e) {
   else if (k === 'stress') { submitStress(); }
   else if (k === 'care') { submitCare(); }
   else if (k === 'checkin') { submitCheckin(); }
+  else if (k === 'pastw') { submitPastWeight(); }
 });
 $('sheetwrap').addEventListener('click', function (e) { if (e.target === this) { closeSheet(true); } });
 document.addEventListener('keydown', function (e) { if (e.keyCode === 27 && $('sheetwrap').className !== 'hidden') { closeSheet(true); } });
