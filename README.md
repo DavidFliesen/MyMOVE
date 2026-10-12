@@ -1,4 +1,4 @@
-# MyMOVE! — v1.2.0
+# MyMOVE! — v1.3.0
 
 **A pocket companion for Veterans in the VA MOVE! Weight Management Program.**
 
@@ -15,7 +15,7 @@ MyMOVE! works whether you're starting MOVE! today or are already weeks in.
 
 - **At setup**, choose **Already enrolled**. Enter your current week (for example, week 7) or your program start date; whichever you enter, the other fills in automatically.
 - **Enter your starting weight** from when you began MOVE!, and optionally your weight today. Setup shows your progress so far: pounds and percent lost, and your weekly average.
-- **Earlier modules** can be marked complete automatically. You can still open and review every one of them.
+- **Earlier modules** stay open for review. A module is only marked complete when you tap **Mark Module Complete** in it.
 - **Past weigh-ins** from your MOVE! visits can be added in **Progress → Weigh-in history**, so the weight chart shows your whole journey.
 - **Past weekly check-ins** can be filled in by picking the week in the check-in form.
 - **Past days' food and activity** can be logged using the back arrow on the Log tab.
@@ -35,6 +35,7 @@ The Today screen shows:
 - Weekly active minutes against the target: 150, rising to 300 from Week 9.
 - Strength days, which count toward the 2-day target.
 - Water against 9+ cups.
+- Steps today, against your daily step goal if you set one.
 
 It also lets you:
 - Track your two SMART goals by tapping each day you hit them.
@@ -43,15 +44,18 @@ It also lets you:
 - Open quick craving and stress tools.
 
 ### Log
-- **Food log:** time, amount, calories, meal and mood, matching the workbook's Food and Activity Log. Recent items can be re-added in one tap.
+- **Food log:** time, amount, calories, meal and mood, matching the workbook's Food and Activity Log.
+- **Automatic calories:** search the built-in list of about 200 common foods and drinks. Pick one and the calories fill in; change the number of servings and they recalculate (for example, 1½ × 3 oz chicken breast = 210 calories). Values are typical estimates, so use the label when you have it.
+- **My foods:** anything you enter by hand with calories is remembered and shows up in future searches. Recent items can be re-added in one tap, and **Save & add another** keeps the form open for logging a whole meal.
 - **Activity log:** minutes, type and effort on the RPE scale. Only effort of 4 or higher counts toward weekly minutes, and vigorous minutes count double.
+- **Steps:** enter each day's step count from your phone, watch or pedometer, plus an optional daily step goal. The Step Goal Builder can set the goal for you.
 - **Water and weight**, for any past day.
 
 ### Program
 - **MOVE! Veteran Workbook link:** the official workbook PDF is linked as the app's companion in the Program tab, the More tab, and every module. Each module shows the workbook pages where its lesson appears.
 - Each module is labeled by week. **You're here** marks your current week and **Review** marks earlier ones.
 - **Go to my week** jumps straight to your current module. Inside a module, use **‹ Week / My week / Week ›** to move between weeks.
-- A **Mark weeks complete** button catches up earlier modules in one tap.
+- Tools opened from a module have a **‹ Back to Module** button. Opening tools never completes a module; only **Mark Module Complete** does, and completed modules show a green badge.
 - All 16 modules plus 3 mini-modules: Weight and Sleep, Quit Tobacco, and Be Involved in Your Health Care.
 - Each module has plain-language key points and a "Bring it home this week" checklist.
 - Each module links to the tools it uses.
@@ -71,11 +75,11 @@ It also lets you:
 - Weight trend chart with a goal-weight line.
 - 5%, 8% and 10% milestones.
 - Weekly active-minute bars with reference lines at 150 and 300.
-- Logging streak, check-in history and your chosen rewards.
+- Logging streak, average steps, check-in history and your chosen rewards.
 
 ### More
-- VA MOVE! Get Started steps and links.
-- Veterans Crisis Line: dial **988 then press 1**, or text **838255**.
+- Weekly check-in, plan settings, weigh-in history and rewards.
+- MOVE! Veteran Workbook link.
 - Back up and restore your data.
 - Share a progress summary with your MOVE! team.
 
@@ -118,7 +122,8 @@ icons/
 ## Technical notes
 
 - **Code style:** a single-file app written in ES5-only JavaScript. It uses no template literals, arrow functions, `let` or `const`, and no CSS custom properties; all colors are hardcoded hex values.
-- **Dependencies:** none. There are no frameworks, no build step and no external requests.
+- **Dependencies:** none. There are no frameworks, no build step and no external requests. The food calorie list is built into `index.html`.
+- **Layout:** works down to 320 px wide. Paired fields stack on narrow phones, and overlays stay below the status bar and notch.
 - **Saved data:** stored under the local storage key `mymove.v1`.
 - **Service worker:** the app page is network-first, so updates arrive when online, and falls back to the cache offline. Icons and the manifest are cache-first.
 - **Releasing an update:** bump `VERSION` in `index.html`, `CACHE` in `sw.js`, and the version at the top of this README.
@@ -137,10 +142,11 @@ Program content is adapted and summarized from:
 
 | Version | Date | Notes |
 |---|---|---|
+| 1.3.0 | 2026-10-12 | Daily step count and step goal; built-in food search with automatic calorie calculation by servings, plus remembered My Foods and Save & add another. Layout fixes so fields never overlap or run off-screen, and overlays no longer slide under the status bar. Removed Getting Started and crisis cards from More. Modules complete only via Mark Module Complete (removed setup auto-complete and bulk catch-up); Back to Module button in tools; completed badge. Credit changed to David Fliesen. |
 | 1.2.0 | 2026-10-12 | MOVE! Veteran Workbook (PDF) linked as companion in Program, More and every module, with each module's workbook page range. |
 | 1.1.0 | 2026-10-12 | Support for Veterans already enrolled: start at any week, set program start date and starting weight, auto-complete earlier modules, Weigh-In History for past weigh-ins, check-ins for past weeks, week labels and review navigation in Program, start date and weekly average on Progress. |
 | 1.0.0 | 2026-10-12 | First release: plan setup, Today dashboard, food, activity, water and weight logs, 16 modules + 3 mini-modules, 25 tools, weekly check-in, progress charts, offline PWA, backup and restore. |
 
 ---
 
-Built by ARTEZIQ.
+Built by David Fliesen.
