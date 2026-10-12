@@ -1,4 +1,4 @@
-# MyMOVE! — v1.3.0
+# MyMOVE! — v1.4.0
 
 **A pocket companion for Veterans in the VA MOVE! Weight Management Program.**
 
@@ -16,10 +16,19 @@ MyMOVE! works whether you're starting MOVE! today or are already weeks in.
 - **At setup**, choose **Already enrolled**. Enter your current week (for example, week 7) or your program start date; whichever you enter, the other fills in automatically.
 - **Enter your starting weight** from when you began MOVE!, and optionally your weight today. Setup shows your progress so far: pounds and percent lost, and your weekly average.
 - **Earlier modules** stay open for review. A module is only marked complete when you tap **Mark Module Complete** in it.
-- **Past weigh-ins** from your MOVE! visits can be added in **Progress → Weigh-in history**, so the weight chart shows your whole journey.
+- **Past weigh-ins** from your MOVE! visits can be added one at a time in **Progress → Weigh-in history**, or in bulk from a file (see below), so the weight chart shows your whole journey.
 - **Past weekly check-ins** can be filled in by picking the week in the check-in form.
 - **Past days' food and activity** can be logged using the back arrow on the Log tab.
 - **Already set up as new?** Go to **More → Edit my plan, week & start date** and switch to *Already enrolled*. A prompt on the Today screen does the same.
+
+### Encouragement
+MyMOVE! notices when you do well and says so. The praise is specific and sincere, never generic.
+- **Weigh-ins:** celebrates your first pound, every 5 lb, the 5%, 8% and 10% milestones, and reaching your goal (each milestone only once). It also notes new lows and drops since your last weigh-in.
+- **When the number goes up:** a kind, steadying message instead of silence. Thanks for weighing in honestly, plus the reminder that the trend matters more than one reading.
+- **Safety first:** if weight is coming off faster than MOVE!'s safe ½–2 lb a week, the message adds a caring note to make sure you're eating enough and to check with your care team.
+- **Activity:** your first session; reaching 150 and 300 minutes a week; 2 strength days; active 5 days a week.
+- **Other habits:** step goals and personal bests, 9 cups of water, logging streaks (3, 7, 14, 30+ days), SMART goal days, completed modules and check-ins.
+- **Your wins:** a card on Today sums up what's going well: pounds lost, active minutes, logging streak, step goals and modules.
 
 ### Plan setup
 - Enter your current weight and pick a goal of 5%, 7%, 8% or 10%.
@@ -27,6 +36,21 @@ MyMOVE! works whether you're starting MOVE! today or are already weeks in.
 - The app shows your goal weight and an estimated target date.
 - Your daily calorie target uses the MOVE! ranges (1,200–1,500 for women, 1,500–1,800 for men) and never goes below 1,200. If your care team gave you a number, enter that instead.
 - It also includes the readiness and confidence scales and "My reasons to MOVE!", based on the workbook's decisional balance exercise.
+
+### Bulk weigh-in import
+In **Progress → Weigh-in history → Import from a file**:
+- **Apple Health:** in the Health app, tap your profile picture → *Export All Health Data* and save to Files. Tap the zip in Files to unzip it, then choose **export.xml** from the *apple_health_export* folder.
+  - Only body-weight records are read; BMI and everything else is ignored.
+  - Large exports are read in chunks, so the phone doesn't freeze.
+- **CSV files:** exports from Weight Gurus, Garmin Connect, Fitbit, MyFitnessPal, export apps, or your own spreadsheet.
+  - The date and weight columns are found automatically. Dates can look like 2026-08-31, 8/31/2026, 31.08.2026 or Aug 31, 2026, and commas, semicolons and tabs all work.
+  - Weights can be in lb or kg; kg is converted. If the file doesn't say which unit it uses, the preview asks you to confirm.
+  - A sample CSV can be downloaded from the import card.
+- **Before anything is saved, a preview shows:**
+  - the date range and a few sample rows;
+  - entries that will be skipped: before your start date, future-dated, or outside a normal weight range;
+  - any days you've already logged, with an option to replace them.
+- **Several readings on one day:** the earliest is used, which is usually your morning weigh-in.
 
 ### Today
 The Today screen shows:
@@ -142,6 +166,7 @@ Program content is adapted and summarized from:
 
 | Version | Date | Notes |
 |---|---|---|
+| 1.4.0 | 2026-10-12 | Encouragement throughout: milestone celebrations (first pound, every 5 lb, 5/8/10%, goal), new lows, kind messages when weight goes up, a safety note for losing too fast, activity, step, water, streak, SMART goal, module and check-in praise, and a Your wins card on Today. Bulk weigh-in import from Apple Health export.xml and CSV (Weight Gurus, Garmin, Fitbit, MyFitnessPal, spreadsheets), with lb/kg handling, preview, skip rules and optional replace. |
 | 1.3.0 | 2026-10-12 | Daily step count and step goal; built-in food search with automatic calorie calculation by servings, plus remembered My Foods and Save & add another. Layout fixes so fields never overlap or run off-screen, and overlays no longer slide under the status bar. Removed Getting Started and crisis cards from More. Modules complete only via Mark Module Complete (removed setup auto-complete and bulk catch-up); Back to Module button in tools; completed badge. Credit changed to David Fliesen. |
 | 1.2.0 | 2026-10-12 | MOVE! Veteran Workbook (PDF) linked as companion in Program, More and every module, with each module's workbook page range. |
 | 1.1.0 | 2026-10-12 | Support for Veterans already enrolled: start at any week, set program start date and starting weight, auto-complete earlier modules, Weigh-In History for past weigh-ins, check-ins for past weeks, week labels and review navigation in Program, start date and weekly average on Progress. |

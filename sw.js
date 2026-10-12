@@ -1,5 +1,5 @@
 /* MyMOVE! service worker - offline app shell (ES5) */
-var CACHE = 'mymove-v1.3.0';
+var CACHE = 'mymove-v1.4.0';
 var SHELL = [
   './',
   './index.html',

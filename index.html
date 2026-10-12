@@ -108,6 +108,19 @@ nav#tabs button.on svg{stroke:#1d4f91}
 #sheetbody{flex:1 1 auto;min-height:0;overscroll-behavior:contain;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(24px + env(safe-area-inset-bottom))}
 #toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#12284c;color:#ffffff;padding:11px 18px;border-radius:24px;font-weight:700;font-size:15px;z-index:60;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;text-align:center}
 #toast.show{opacity:1}
+#cheer{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:70;display:none;max-width:696px;margin:0 auto}
+#cheer.show{display:block;-webkit-animation:pop .35s ease-out;animation:pop .35s ease-out}
+.cheerin{display:flex;gap:10px;align-items:flex-start;background:#fff6dd;border:2px solid #f2b632;color:#12284c;border-radius:14px;padding:12px 8px 12px 16px;box-shadow:0 6px 22px rgba(18,40,76,.28)}
+.cheerin .grow{min-width:0;font-weight:400}
+.cheerin .small{font-weight:400;line-height:1.4}
+.cheerin b{display:block;font-size:17px;margin-bottom:2px}
+.cheerin.big{background:#12284c;color:#ffffff;border-color:#f2b632}
+.cheerin.big b{color:#f2b632;font-size:19px}
+.cheerin.big b:before{content:"\2605  "}
+.cheerin button{border:0;background:transparent;font-size:18px;font-weight:800;color:inherit;width:40px;height:40px;flex:0 0 40px;cursor:pointer}
+@-webkit-keyframes pop{from{-webkit-transform:translateY(24px);opacity:0}to{-webkit-transform:none;opacity:1}}
+@keyframes pop{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.wins li{margin:0 0 6px 20px}
 .big{font-size:34px;font-weight:800;color:#12284c;line-height:1.1}
 .timer{font-size:56px;font-weight:800;text-align:center;color:#12284c;font-variant-numeric:tabular-nums;margin:10px 0}
 .breath{width:180px;height:180px;margin:20px auto;border-radius:50%;background:#1d4f91;opacity:.85;transform:scale(.55);transition:transform 4s ease-in-out}
@@ -146,13 +159,14 @@ th,td{overflow-wrap:anywhere;word-wrap:break-word}
 </nav>
 <div id="sheetwrap" class="hidden"><div id="sheet" role="dialog" aria-modal="true"><div class="sheethead"><h2 id="sheettitle"></h2><button data-act="closeSheet" aria-label="Close">&#10005;</button></div><div id="sheetbody"></div></div></div>
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="cheer" role="status" aria-live="polite"></div>
 <input type="file" id="importfile" accept="application/json,.json" class="hidden">
 
 <script>
 (function () {
 'use strict';
 
-var VERSION = '1.3.0';
+var VERSION = '1.4.0';
 var KEY = 'mymove.v1';
 
 /* ---------- Program content (adapted from the MOVE! Veteran Workbook, 2023) ---------- */
@@ -329,7 +343,7 @@ var TIPS = ['Log it as you go. Memory underestimates.','Drink a glass of water b
 
 /* ---------- State ---------- */
 function blank() {
-  return {profile:null,food:{},act:{},water:{},weights:[],goals:{},checkins:[],mods:{},thoughts:[],problems:[],stress:[],slipPlan:{},rewards:[],customRewards:[],triggers:{},plan:{days:{},list:''},toolkit:{},care:'',myFoods:{},steps:{},stepGoal:0,ui:{tab:'today',logDate:'',logSeg:'food'}};
+  return {profile:null,food:{},act:{},water:{},weights:[],goals:{},checkins:[],mods:{},thoughts:[],problems:[],stress:[],slipPlan:{},rewards:[],customRewards:[],triggers:{},plan:{days:{},list:''},toolkit:{},care:'',myFoods:{},steps:{},stepGoal:0,cel:{},ui:{tab:'today',logDate:'',logSeg:'food'}};
 }
 var S = load();
 function load() {
@@ -542,6 +556,7 @@ function submitSetup() {
   if (first) {
     toast(enr ? 'Welcome aboard. Picking up at week ' + w + '.' : 'Your plan is set. Let’s MOVE!');
     S.ui.tab = 'today'; setTab('today'); openModule(w > 16 ? 16 : w);
+    if (enr && now >= 80 && now < wt) { var ms0 = milestone(now, true); save(); cheer(ms0 ? ms0.t : 'Down ' + r1(wt - now) + ' lb so far!', 'Welcome to MyMOVE! You\u2019ve already put in ' + (w - 1) + ' week' + (w === 2 ? '' : 's') + ' of real work. Let\u2019s keep it going together.', true); }
   } else { toast('Plan saved' + (enr ? ' · week ' + w : '')); render(); }
 }
 
@@ -553,6 +568,8 @@ function viewToday() {
   h += '<h1>' + (p.name ? 'Hello, ' + esc(p.name) + '.' : 'Hello.') + '</h1>';
   h += '<div class="card navy" data-act="module" data-v="' + m + '" style="cursor:pointer"><div class="row between"><span class="pill gold">Week ' + w + (w > 16 ? ' \u00b7 Maintenance' : '') + '</span><span class="muted small">' + (S.mods[m] && S.mods[m].done ? 'Done \u2713' : 'Tap to open') + '</span></div><h2 style="margin-top:8px">Module ' + m + ': ' + esc(md.t) + '</h2><p class="muted" style="margin:0">' + esc(md.s) + '</p></div>';
   h += '<div class="quick" style="margin-bottom:14px"><button class="btn" data-act="addFood"><span>+</span>Food</button><button class="btn" data-act="addAct"><span>+</span>Activity</button><button class="btn" data-act="water" data-v="1"><span>+</span>Water</button><button class="btn" data-act="addWeight"><span>+</span>Weight</button></div>';
+  var wins = winsList();
+  if (wins.length) { h += '<div class="card" style="border-left:5px solid #2e7d4f"><h3 style="margin-top:0">Your wins</h3><ul class="wins small">' + wins.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul><p class="muted small" style="margin:6px 0 0">' + esc(pickOne(['Every one of these took effort. Thank you for showing up for yourself.', 'Real progress, earned honestly. Keep going.', 'This is what consistency looks like. Well done.'])) + '</p></div>'; }
   var left = p.cal - eaten + out;
   h += '<div class="card"><div class="row between"><h2 style="margin:0">Calories today</h2><span class="pill">' + commas(p.cal) + ' target</span></div>';
   h += barHtml(eaten - out, p.cal);
@@ -751,8 +768,9 @@ function submitFood(d, more) {
   if (!S.food[d]) { S.food[d] = []; }
   S.food[d].push(e);
   save();
-  if (more) { toast('Logged ' + item + '. Add the next item.'); ACT.addFood(); }
-  else { closeSheet(true); toast('Logged'); }
+  if (more) { ACT.addFood(); if (!streakCheer()) { toast('Logged ' + item + '. Add the next item.'); } }
+  else { closeSheet(true); if (!streakCheer()) { toast('Logged'); } }
+  save();
 }
 ACT.delFood = function (id) { var d = S.ui.logDate || today(), a = S.food[d] || [], i; for (i = 0; i < a.length; i++) { if (a[i].id === id) { a.splice(i, 1); break; } } save(); render(); };
 ACT.addAct = function () {
@@ -780,20 +798,23 @@ function submitAct(d) {
   var name = val('a_name').replace(/^\s+|\s+$/g, ''), m = Math.round(num(val('a_min')));
   if (!name || m <= 0) { toast('Enter activity and minutes'); return; }
   if (!S.act[d]) { S.act[d] = []; }
-  S.act[d].push({id: uid(), name: name, min: m, type: val('a_type'), rpe: num(val('a_rpe')), kcal: val('a_kcal') === '' ? '' : Math.round(num(val('a_kcal')))});
-  save(); closeSheet(true); toast('Activity logged');
+  var before = weekActivity(weekNo()), entry = {id: uid(), name: name, min: m, type: val('a_type'), rpe: num(val('a_rpe')), kcal: val('a_kcal') === '' ? '' : Math.round(num(val('a_kcal')))};
+  S.act[d].push(entry);
+  save(); closeSheet(true); actCheer(d, entry, before); save();
 }
 function submitSteps(d) {
   var n = Math.round(num(val('st_day'))), g = Math.round(num(val('st_goal')));
   if (n < 0 || n > 100000) { toast('Enter a valid step count'); return; }
-  if (n) { S.steps[d] = n; } else { delete S.steps[d]; }
+  var prevN = S.steps[d] || 0;
   S.stepGoal = g > 0 ? g : 0;
-  save(); render(); toast(n ? commas(n) + ' steps saved' : 'Steps cleared');
+  if (n) { S.steps[d] = n; } else { delete S.steps[d]; }
+  save(); render();
+  if (n) { stepCheer(d, n, prevN); save(); } else { toast('Steps cleared'); }
 }
 function avgSteps(n) { var t = 0, c = 0, i, d = today(); for (i = 0; i < n; i++) { var v = S.steps[addDays(d, -i)]; if (v) { t += v; c++; } } return c ? Math.round(t / c) : 0; }
 ACT.delAct = function (id) { var d = S.ui.logDate || today(), a = S.act[d] || [], i; for (i = 0; i < a.length; i++) { if (a[i].id === id) { a.splice(i, 1); break; } } save(); render(); };
 ACT.stepsToday = function () { S.ui.logDate = today(); S.ui.logSeg = 'act'; setTab('log'); setTimeout(function () { var el = $('st_day'); if (el) { el.scrollIntoView({block: 'center'}); el.focus(); } }, 60); };
-ACT.water = function (v) { var t = today(); S.water[t] = Math.max(0, (S.water[t] || 0) + num(v)); save(); render(); if (num(v) > 0) { toast(S.water[t] + ' cups today'); } };
+ACT.water = function (v) { var t = today(); S.water[t] = Math.max(0, (S.water[t] || 0) + num(v)); save(); render(); if (num(v) > 0) { if (S.water[t] === 9 && !celebrated('water-' + t)) { save(); cheer('9 cups of water today!', 'Well hydrated. Water keeps your energy up, your joints happy and your hunger in check. Nice work.'); } else { toast(S.water[t] + ' cups today'); } } };
 ACT.waterDay = function (v) { var d = S.ui.logDate || today(); S.water[d] = Math.max(0, (S.water[d] || 0) + num(v)); save(); render(); };
 ACT.addWeight = function () {
   var d = S.ui.tab === 'log' ? (S.ui.logDate || today()) : today();
@@ -808,12 +829,11 @@ function submitWeight() {
   if (d < S.profile.startDate) { toast('That\u2019s before your start date. Change it in My plan first.'); return; }
   upsertWeight(d, lb); if (d === S.profile.startDate) { S.profile.startWeight = lb; }
   save(); closeSheet(true);
-  var lost = r1(S.profile.startWeight - lb), p5 = Math.round(S.profile.startWeight * 0.05);
-  toast(lost > 0 ? (lost >= p5 ? '5% milestone reached! ' : '') + 'Down ' + lost + ' lb since you started' : 'Weight logged. Keep going.');
+  weightCheer(d, lb); save();
 }
 ACT.logDay = function (v) { var d = addDays(S.ui.logDate || today(), num(v)); if (d > today()) { return; } S.ui.logDate = d; save(); render(); };
 ACT.logSeg = function (v) { S.ui.logSeg = v; save(); render(); };
-ACT.goalDay = function (v) { var p = v.split('|'), g = getGoals(weekNo()), key = p[0] === 'eat' ? 'eatDays' : 'actDays'; if (g[key][p[1]]) { delete g[key][p[1]]; } else { g[key][p[1]] = true; toast('Nice work. That counts.'); } save(); render(); };
+ACT.goalDay = function (v) { var p = v.split('|'), g = getGoals(weekNo()), key = p[0] === 'eat' ? 'eatDays' : 'actDays'; if (g[key][p[1]]) { delete g[key][p[1]]; } else { g[key][p[1]] = true; var cnt = 0, ds = weekDates(weekNo()), q; for (q = 0; q < ds.length; q++) { if (g[key][ds[q]]) { cnt++; } } if (cnt === 7) { cheer('7 for 7 this week!', 'You hit your ' + (p[0] === 'eat' ? 'healthy eating' : 'activity') + ' goal every single day. That\u2019s what a habit looks like. Outstanding.', true); } else if (cnt === 5 && !celebrated('g5-' + p[0] + weekNo())) { cheer('5 days on track!', pickOne(PRAISE.goalDay)); } else { toast(pickOne(PRAISE.goalDay)); } } save(); render(); };
 
 /* ---------- Program ---------- */
 function viewProgram() {
@@ -873,7 +893,12 @@ function openModule(n) {
 ACT.module = function (v) { openModule(v); };
 ACT.hideTip = function (v) { S.ui[v] = true; save(); render(); };
 ACT.modTodo = function (v, el) { var p = v.split('|'); if (!S.mods[p[0]]) { S.mods[p[0]] = {todo: {}}; } if (!S.mods[p[0]].todo) { S.mods[p[0]].todo = {}; } S.mods[p[0]].todo[p[1]] = el.checked; save(); };
-ACT.modDone = function (v) { if (!S.mods[v]) { S.mods[v] = {todo: {}}; } S.mods[v].done = !S.mods[v].done; save(); toast(S.mods[v].done ? 'Module complete. Well done!' : 'Marked not complete'); openModule(v); };
+ACT.modDone = function (v) { if (!S.mods[v]) { S.mods[v] = {todo: {}}; } S.mods[v].done = !S.mods[v].done; save(); openModule(v);
+  if (S.mods[v].done) { var dn = 0, z; for (z = 1; z <= 16; z++) { if (S.mods[z] && S.mods[z].done) { dn++; } }
+    var md = findMod(v);
+    if (dn === 16 && typeof md.n === 'number') { cheer('All 16 modules complete!', 'You\u2019ve worked through the entire MOVE! program. The tools are yours now. Keep using them, and be proud of every step it took to get here.', true); }
+    else { cheer((typeof md.n === 'number' ? 'Module ' + md.n : md.t) + ' complete', pickOne(PRAISE.module) + (typeof md.n === 'number' ? ' ' + dn + ' of 16 done.' : '')); }
+  } else { toast('Marked not complete'); } };
 
 /* ---------- Progress ---------- */
 function viewProgress() {
@@ -1255,7 +1280,7 @@ function submitCheckin() {
   S.checkins.push({date: d, week: wk, eatMet: val('ck_e'), actMet: val('ck_a'), lb: lb >= 80 ? lb : '', wins: val('ck_win'), chal: val('ck_ch'), help: val('ck_help'), benefits: b});
   if (lb >= 80) { upsertWeight(d, lb); }
   save();
-  if (recent) { toast('Check-in saved. Now set this week’s goals.'); ACT.tool('smart'); }
+  if (recent) { ACT.tool('smart'); if (lb >= 80 && d === today()) { weightCheer(d, lb); save(); } else { cheer('Check-in saved', 'Thank you for taking time to reflect. That honest look back is how MOVE! works. Now set this week\u2019s goals.'); } }
   else { toast('Week ' + wk + ' saved'); ckWeek = wk > 1 ? wk - 1 : null; ACT.tool('checkin'); }
 }
 
@@ -1265,6 +1290,7 @@ TOOLFN.weights = function () {
   var h = '<form data-form="pastw" class="card"><p class="muted small">Add weigh-ins from your MOVE! visits or your own scale since you started on <b>' + fmtLong(p.startDate) + '</b>. One a week is plenty. To change your start date or starting weight, use <a href="#" data-act="editPlan">My plan</a>.</p>';
   h += '<div class="grid2"><div><label for="pw_d">Date</label><input type="date" id="pw_d" min="' + p.startDate + '" max="' + today() + '" value="' + def + '"></div><div><label for="pw_lb">Weight (lb)</label><input type="number" inputmode="decimal" id="pw_lb" step="0.1" min="80" max="700" required></div></div>';
   h += '<button class="btn gold block" type="submit" style="margin-top:12px">Add weigh-in</button></form>';
+  h += importCardHtml();
   h += '<div class="card"><h2>History</h2><div class="list">';
   for (i = 0; i < ws.length; i++) {
     var isStart = ws[i].date === p.startDate, diff = r1(ws[i].lb - p.startWeight);
@@ -1272,6 +1298,7 @@ TOOLFN.weights = function () {
   }
   return h + '</div></div>';
 };
+AFTER.weights = function () { var fi = $('imp_file'); if (fi) { fi.onchange = function () { handleImportFile(this.files && this.files[0]); this.value = ''; }; } };
 function weekFromStart2(d) { var n = daysBetween(S.profile.startDate, d); return n < 0 ? 1 : Math.floor(n / 7) + 1; }
 function submitPastWeight() {
   var d = val('pw_d'), lb = r1(num(val('pw_lb')));
@@ -1286,9 +1313,296 @@ function submitPastWeight() {
 }
 ACT.delWeight = function (d) { var i; for (i = S.weights.length - 1; i >= 0; i--) { if (S.weights[i].date === d) { S.weights.splice(i, 1); } } save(); ACT.tool('weights'); };
 
+/* ---------- Encouragement ---------- */
+var PRAISE = {
+  loss: ['That’s real progress, earned one choice at a time.', 'Your effort is showing up on the scale. Well done.', 'Steady and honest work pays off. Keep doing what you’re doing.', 'That number moved because you did the work. Be proud of that.', 'Small losses add up to big health gains. Nice work.'],
+  steady: ['Holding steady still counts. Keep logging and the trend will tell the story.', 'Same as last time, and that’s okay. Plateaus are part of every journey.', 'Showing up to weigh in is a win on its own. Keep going.'],
+  gain: ['Thank you for weighing in honestly. That takes real discipline, and it’s what makes MOVE! work.', 'One weigh-in is a snapshot, not the whole story. Look at the trend, and get back to your plan at the next meal.', 'Weights go up and down day to day with water and salt. You’re still in this, and that’s what matters.'],
+  activity: ['Every minute counts, and these count.', 'Your heart, joints and mood all thank you for that.', 'Moving your body is a promise kept to yourself. Well done.', 'That’s how habits are built: one session at a time.', 'Good work. You chose to move today.'],
+  strength: ['Strong work. Muscle helps you burn more and move better.', 'Strength training done. Your future self will feel the difference.'],
+  steps: ['Every step adds up. Well walked.', 'Nice work getting those steps in.', 'Your feet did the talking today. Good job.'],
+  module: ['You’re building the skills that make change last.', 'Another lesson in the bank. That knowledge is yours for life.', 'Well done. Learning the “why” makes the “how” easier.'],
+  goalDay: ['Goal hit today. That’s a promise kept.', 'Another day on track. This is how habits are made.', 'Nicely done. Consistency beats perfection.']
+};
+function pickOne(a) { return a[Math.floor(Math.random() * a.length)]; }
+function celebrated(key) { if (!S.cel) { S.cel = {}; } if (S.cel[key]) { return true; } S.cel[key] = today(); return false; }
+var cheerH = null;
+function cheer(title, msg, big) {
+  var el = $('cheer');
+  el.innerHTML = '<div class="cheerin' + (big ? ' big' : '') + '"><div class="grow"><b>' + esc(title) + '</b>' + (msg ? '<div class="small">' + esc(msg) + '</div>' : '') + '</div><button type="button" aria-label="Dismiss" data-act="cheerClose">✕</button></div>';
+  el.className = 'show';
+  clearTimeout(cheerH); cheerH = setTimeout(function () { el.className = ''; }, big ? 9000 : 6000);
+}
+ACT.cheerClose = function () { clearTimeout(cheerH); $('cheer').className = ''; };
+function prevWeightBefore(d) { var ws = sortedWeights(), i, p = null; for (i = 0; i < ws.length; i++) { if (ws[i].date < d) { p = ws[i]; } } return p; }
+function lowestBefore(d) { var ws = S.weights, i, lo = null; for (i = 0; i < ws.length; i++) { if (ws[i].date < d && (lo === null || ws[i].lb < lo)) { lo = ws[i].lb; } } return lo; }
+function milestone(lb, mark) {
+  if (!S.cel) { S.cel = {}; }
+  var p = S.profile, lost = r1(p.startWeight - lb), pct = lost / p.startWeight * 100, gl = goalLbs(), c = [], m, i, pick = null;
+  if (gl > 0 && lost >= gl) { c.push(['goal' + p.goalPct, 'You reached your goal: ' + lost + ' lb lost!', 'That\u2019s ' + r1(pct) + '% of your starting weight. This is a major health win, earned week by week. Celebrate it, then talk with your team about your next goal.']); }
+  if (pct >= 10) { c.push(['pct10', '10% milestone: ' + lost + ' lb lost!', 'You\u2019ve hit the top of MOVE!\u2019s recommended range. That\u2019s a big deal for your heart, joints and blood sugar.']); }
+  if (pct >= 8) { c.push(['pct8', '8% milestone: ' + lost + ' lb lost!', 'You\u2019re well past the point where health benefits kick in. Outstanding effort.']); }
+  if (pct >= 5) { c.push(['pct5', '5% milestone: ' + lost + ' lb lost!', 'Research shows losing 5% lowers your risk of heart disease, high blood pressure and type 2 diabetes. You did that.']); }
+  for (m = Math.floor(lost / 5) * 5; m >= 5; m -= 5) { c.push(['lb' + m, m + ' pounds down!', 'From ' + r1(p.startWeight) + ' to ' + lb + ' lb. ' + pickOne(PRAISE.loss)]); }
+  if (lost >= 1) { c.push(['lb1', 'Your first pound is gone!', 'Every journey starts with the first one. ' + pickOne(PRAISE.loss)]); }
+  for (i = 0; i < c.length; i++) { if (!S.cel[c[i][0]] && !pick) { pick = {t: c[i][1], m: c[i][2]}; } if (mark) { S.cel[c[i][0]] = S.cel[c[i][0]] || today(); } }
+  return pick;
+}
+function weightCheer(d, lb) {
+  var p = S.profile, lost = r1(p.startWeight - lb), pct = lost / p.startWeight * 100, prev = prevWeightBefore(d), lo = lowestBefore(d);
+  var note = '', title = '', msg = '', big = false;
+  if (prev) {
+    var days = daysBetween(prev.date, d), rate = days > 0 ? (prev.lb - lb) / (days / 7) : 0;
+    if (days >= 7 && rate > 2.5) { note = ' That’s faster than the ½–2 lb a week MOVE! considers safe, so make sure you’re eating enough and check in with your care team.'; }
+  }
+  var ms = milestone(lb, true);
+  if (ms) { title = ms.t; msg = ms.m; big = true; }
+  if (title) { cheer(title, msg + note, big); return; }
+  if (prev && lb < prev.lb - 0.1) {
+    title = 'Down ' + r1(prev.lb - lb) + ' lb since your last weigh-in';
+    if (lo !== null && lb < lo) { title += ', a new low!'; }
+    cheer(title, (lost > 0 ? lost + ' lb lost in total. ' : '') + pickOne(PRAISE.loss) + note);
+  } else if (prev && lb > prev.lb + 0.1) {
+    cheer('Thanks for weighing in', pickOne(PRAISE.gain) + (lost > 0 ? ' You’re still ' + lost + ' lb down overall.' : ''));
+  } else if (prev) {
+    cheer('Holding steady', pickOne(PRAISE.steady) + (lost > 0 ? ' Still ' + lost + ' lb down overall.' : ''));
+  } else { toast('Weight logged'); }
+}
+function actCheer(d, entry, before) {
+  var w = weekNo(), inWeek = weekDates(w).indexOf(d) >= 0, after = weekActivity(w), all = 0, k;
+  for (k in S.act) { if (S.act.hasOwnProperty(k)) { all += S.act[k].length; } }
+  if (all === 1 && !celebrated('firstAct')) { cheer('Your first activity is logged!', entry.name + ', ' + entry.min + ' minutes. Every journey starts with a single session. Well done.', true); return; }
+  if (inWeek) {
+    if (before.equiv < 300 && after.equiv >= 300 && !celebrated('w300-' + w)) { cheer('300 active minutes this week!', 'That’s the MOVE! target for weight loss. You’re showing serious commitment. Outstanding.', true); return; }
+    if (before.equiv < 150 && after.equiv >= 150 && !celebrated('w150-' + w)) { cheer('150 active minutes this week!', 'You’ve met the weekly activity guideline that protects your heart and health. Well done.', true); return; }
+    if (before.strength < 2 && after.strength >= 2 && !celebrated('str2-' + w)) { cheer('Strength goal met for the week', 'Two days of strength work. ' + pickOne(PRAISE.strength), true); return; }
+    if (before.days < 5 && after.days >= 5 && !celebrated('days5-' + w)) { cheer('Active 5 days this week!', 'Spreading activity across the week is exactly what MOVE! recommends. Nice consistency.', true); return; }
+  }
+  cheer(entry.min + ' minutes logged', (entry.type === 'Strength' ? pickOne(PRAISE.strength) : pickOne(PRAISE.activity)) + (inWeek ? ' ' + after.equiv + ' active minutes this week.' : ''));
+}
+function stepCheer(d, n, prevN) {
+  var g = S.stepGoal, best = 0, cnt = 0, k;
+  for (k in S.steps) { if (S.steps.hasOwnProperty(k) && k !== d) { cnt++; if (S.steps[k] > best) { best = S.steps[k]; } } }
+  if (g && n >= g && prevN < g) { cheer('Step goal reached: ' + commas(n) + ' steps!', pickOne(PRAISE.steps), true); return; }
+  if (cnt >= 3 && n > best && !celebrated('stepbest-' + n)) { cheer('New personal best: ' + commas(n) + ' steps!', 'Your highest day yet. ' + pickOne(PRAISE.steps), true); return; }
+  toast(commas(n) + ' steps saved. ' + pickOne(['Every step counts.', 'Nice work.', 'Keep moving.']));
+}
+function streakCheer() {
+  var s = streak(), marks = [3, 7, 14, 21, 30, 60, 90, 120, 180, 365], i;
+  for (i = 0; i < marks.length; i++) {
+    if (s === marks[i] && !celebrated('streak' + s + '-' + today())) {
+      cheer(s + '-day logging streak!', s >= 30 ? 'A month or more of honest tracking. That kind of consistency is what changes lives.' : (s >= 7 ? 'Tracking effort predicts success in MOVE!, and you’re proving it every day.' : 'Three days in a row. You’re building the most powerful habit in the program.'), true);
+      return true;
+    }
+  }
+  return false;
+}
+function winsList() {
+  var p = S.profile, w = weekNo(), out = [], lost = r1(p.startWeight - currentWeight()), wa = weekActivity(w), st = streak(), ds = weekDates(w), i, hits = 0, done = 0, g = getGoals(w), on = 0;
+  if (lost > 0) { out.push('Down <b>' + lost + ' lb</b> (' + r1(lost / p.startWeight * 100) + '%) since you started' + (lost / p.startWeight >= 0.05 ? ', past the 5% mark that improves health.' : '.')); }
+  if (wa.equiv >= 30) { out.push('<b>' + wa.equiv + '</b> active minutes this week' + (wa.equiv >= 150 ? ', guideline met!' : '.')); }
+  if (st >= 2) { out.push('<b>' + st + '-day</b> logging streak.'); }
+  for (i = 0; i < ds.length; i++) { if (S.stepGoal && (S.steps[ds[i]] || 0) >= S.stepGoal) { hits++; } if (g.eatDays[ds[i]]) { on++; } if (g.actDays[ds[i]]) { on++; } }
+  if (hits) { out.push('Step goal hit <b>' + hits + '</b> day' + (hits > 1 ? 's' : '') + ' this week.'); }
+  if (on >= 2) { out.push('On track with your SMART goals <b>' + on + '</b> times this week.'); }
+  for (i = 1; i <= 16; i++) { if (S.mods[i] && S.mods[i].done) { done++; } }
+  if (done) { out.push('<b>' + done + '</b> of 16 modules complete.'); }
+  return out.slice(0, 4);
+}
+
+/* ---------- Bulk weigh-in import (CSV / Apple Health export.xml) ---------- */
+var impRows = null, impKg = false, impName = '';
+var MONTHS = {jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, sept: 9, oct: 10, nov: 11, dec: 12};
+function mkDate(y, m, d) {
+  y = +y; m = +m; d = +d; if (y < 100) { y += 2000; }
+  if (!y || m < 1 || m > 12 || d < 1 || d > 31) { return null; }
+  var dt = new Date(y, m - 1, d); if (dt.getMonth() !== m - 1) { return null; }
+  return ymd(dt);
+}
+function parseDateStr(s) {
+  s = String(s || '').replace(/^\s+|\s+$/g, '').replace(/^"|"$/g, ''); var m;
+  if ((m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/))) { return {d: mkDate(m[1], m[2], m[3]), t: m[4] ? pad(+m[4]) + m[5] : ''}; }
+  if ((m = s.match(/^(\d{1,2})([\/.-])(\d{1,2})[\/.-](\d{2,4})(?:,?\s+(\d{1,2}):(\d{2})\s*([ap]m)?)?/i))) {
+    var a = +m[1], b = +m[3], mo = a, da = b;
+    if ((a > 12 && b <= 12) || (m[2] === '.' && b <= 12)) { mo = b; da = a; }
+    m = [m[0], m[1], m[3], m[4], m[5], m[6], m[7]];
+    var hr = m[4] ? +m[4] : 0; if (m[6] && /pm/i.test(m[6]) && hr < 12) { hr += 12; } if (m[6] && /am/i.test(m[6]) && hr === 12) { hr = 0; }
+    return {d: mkDate(m[3], mo, da), t: m[4] ? pad(hr) + m[5] : ''};
+  }
+  if ((m = s.match(/([a-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})/i))) { var mn = MONTHS[m[1].toLowerCase().slice(0, 4)] || MONTHS[m[1].toLowerCase().slice(0, 3)]; if (mn) { return {d: mkDate(m[3], mn, m[2]), t: ''}; } }
+  if ((m = s.match(/(\d{1,2})\s+([a-z]{3,9})\.?,?\s+(\d{4})/i)) && MONTHS[m[2].slice(0, 3).toLowerCase()]) { return {d: mkDate(m[3], MONTHS[m[2].slice(0, 3).toLowerCase()], m[1]), t: ''}; }
+  return null;
+}
+function parseWeightStr(s, headerKg) {
+  s = String(s || '').replace(/"/g, ''); var m = s.match(/(-?\d+(?:[.,]\d+)?)/);
+  if (!m) { return null; }
+  var v = parseFloat(m[1].replace(',', '.')), kg = /kg/i.test(s) ? true : (/lb|pound/i.test(s) ? false : headerKg);
+  return {v: v, kg: kg === true, uk: kg === true || kg === false};
+}
+function splitCsvLine(line, delim) {
+  var out = [], cur = '', q = false, i, ch;
+  for (i = 0; i < line.length; i++) {
+    ch = line.charAt(i);
+    if (ch === '"') { if (q && line.charAt(i + 1) === '"') { cur += '"'; i++; } else { q = !q; } }
+    else if (ch === delim && !q) { out.push(cur); cur = ''; }
+    else { cur += ch; }
+  }
+  out.push(cur); return out;
+}
+function parseCsvWeights(text) {
+  var lines = text.replace(/^﻿/, '').split(/\r\n|\n|\r/), rows = [], hdr = -1, dCol = -1, wCol = -1, hKg = null, i, j, cells, delim = ',';
+  var sample = lines.slice(0, 5).join('\n');
+  if ((sample.match(/;/g) || []).length > (sample.match(/,/g) || []).length) { delim = ';'; }
+  else if ((sample.match(/\t/g) || []).length > (sample.match(/,/g) || []).length) { delim = '\t'; }
+  for (i = 0; i < Math.min(lines.length, 15) && hdr < 0; i++) {
+    cells = splitCsvLine(lines[i], delim);
+    for (j = 0; j < cells.length; j++) {
+      var c = cells[j].toLowerCase().replace(/^\s+|\s+$/g, '');
+      if (dCol < 0 && /date|time|day|when/.test(c) && !/update/.test(c)) { dCol = j; }
+      if (wCol < 0 && (/weight|body ?mass|^mass/.test(c)) && !/goal|change|lean|bmi|fat|water|bone|muscle/.test(c)) { wCol = j; if (/kg|kilo/.test(c)) { hKg = true; } else if (/lb|pound/.test(c)) { hKg = false; } }
+    }
+    if (wCol >= 0) { hdr = i; if (dCol < 0) { dCol = 0; } } else { dCol = -1; }
+  }
+  if (hdr < 0) { hdr = -1; dCol = 0; wCol = 1; }
+  var carryDate = null;
+  for (i = hdr + 1; i < lines.length; i++) {
+    if (!lines[i] || !/\d/.test(lines[i])) { continue; }
+    cells = splitCsvLine(lines[i], delim);
+    var dt = parseDateStr(cells[dCol]), w = parseWeightStr(cells[wCol], hKg);
+    if (dt && dt.d) { if (!w || !(w.v > 0)) { carryDate = dt.d; continue; } }
+    else if (carryDate) { dt = {d: carryDate, t: String(cells[dCol] || '').replace(/[^\d]/g, '').slice(0, 4)}; }
+    else { continue; }
+    if (!w || !(w.v > 0)) { continue; }
+    rows.push({d: dt.d, t: dt.t || '', v: w.v, kg: w.kg, uk: w.uk});
+  }
+  return {rows: rows, unitKnown: hKg !== null};
+}
+function scanAppleXml(file, done, progress) {
+  var CH = 4 * 1024 * 1024, pos = 0, tail = '', rows = [], re = /<Record\b[^>]*?type="HKQuantityTypeIdentifierBodyMass"[^>]*>/g;
+  var step = function () {
+    if (pos >= file.size) { done(rows); return; }
+    var rd = new FileReader();
+    rd.onload = function () {
+      var txt = tail + rd.result, cut = txt.lastIndexOf('<'), body = cut > 0 ? txt.slice(0, cut) : txt, m;
+      tail = cut > 0 ? txt.slice(cut) : '';
+      re.lastIndex = 0;
+      while ((m = re.exec(body))) {
+        var tag = m[0], u = (tag.match(/\bunit="([^"]*)"/) || [])[1] || 'lb', sd = (tag.match(/\bstartDate="([^"]*)"/) || [])[1], v = (tag.match(/\bvalue="([^"]*)"/) || [])[1];
+        var dt = parseDateStr(sd);
+        if (dt && dt.d && v) { rows.push({d: dt.d, t: dt.t, v: parseFloat(v), kg: /kg/i.test(u), uk: true}); }
+      }
+      pos += CH; progress(Math.min(100, Math.round(pos / file.size * 100)));
+      setTimeout(step, 0);
+    };
+    rd.onerror = function () { done(null); };
+    rd.readAsText(file.slice(pos, pos + CH));
+  };
+  step();
+}
+function impStatus(html) { var el = $('imp_out'); if (el) { el.innerHTML = html; } }
+function handleImportFile(file) {
+  if (!file) { return; }
+  impName = file.name; impRows = null;
+  impStatus('<p class="small">Reading <b>' + esc(file.name) + '</b>…</p>');
+  var isXml = /\.xml$/i.test(file.name) || /xml/i.test(file.type);
+  if (/\.zip$/i.test(file.name)) { impStatus('<div class="card red small" style="margin:10px 0 0">That’s the zipped export. Open it in the Files app first (tap it to unzip), then choose <b>export.xml</b> from the <b>apple_health_export</b> folder.</div>'); return; }
+  if (isXml) {
+    scanAppleXml(file, function (rows) {
+      if (!rows) { impStatus('<p class="small">Couldn’t read that file.</p>'); return; }
+      finishImport(rows, true);
+    }, function (pc) { impStatus('<p class="small">Reading Apple Health export… ' + pc + '%</p>'); });
+  } else {
+    var rd = new FileReader();
+    rd.onload = function () { var r = parseCsvWeights(String(rd.result)); finishImport(r.rows, r.unitKnown); };
+    rd.onerror = function () { impStatus('<p class="small">Couldn’t read that file.</p>'); };
+    rd.readAsText(file);
+  }
+}
+function finishImport(rows, unitKnown) {
+  if (!rows.length) { impStatus('<div class="card red small" style="margin:10px 0 0">No weigh-ins found in this file. MyMOVE! looks for a date column and a weight column. See the tips below, or download the sample file to check the layout.</div>'); return; }
+  var byDay = {}, i, r;
+  for (i = 0; i < rows.length; i++) { r = rows[i]; if (!byDay[r.d] || (r.t && byDay[r.d].t && r.t < byDay[r.d].t)) { byDay[r.d] = r; } }
+  impRows = [];
+  for (r in byDay) { if (byDay.hasOwnProperty(r)) { impRows.push(byDay[r]); } }
+  impRows.sort(function (a, b) { return a.d < b.d ? -1 : 1; });
+  var j, sum = 0, unk = 0;
+  for (j = 0; j < impRows.length; j++) { if (!impRows[j].uk) { unk++; sum += impRows[j].v; } }
+  impKg = unk > 0 && sum / unk < 140 && sum / unk > 35;
+  renderImportPreview(unk);
+}
+function impConvert(r) { var kg = r.uk ? r.kg : impKg; return r1(kg ? r.v * 2.20462 : r.v); }
+var impUnk = 0;
+function renderImportPreview(unk) {
+  if (unk != null) { impUnk = unk; }
+  var p = S.profile, add = [], dup = 0, before = 0, future = 0, bad = 0, existing = {}, i, lb;
+  for (i = 0; i < S.weights.length; i++) { existing[S.weights[i].date] = S.weights[i].lb; }
+  for (i = 0; i < impRows.length; i++) {
+    lb = impConvert(impRows[i]);
+    if (impRows[i].d > today()) { future++; continue; }
+    if (impRows[i].d < p.startDate) { before++; continue; }
+    if (lb < 70 || lb > 800) { bad++; continue; }
+    if (existing[impRows[i].d] != null) { dup++; }
+    add.push({d: impRows[i].d, lb: lb});
+  }
+  var h = '<div class="card gold" style="margin:12px 0 0"><b>Found ' + impRows.length + ' day' + (impRows.length === 1 ? '' : 's') + ' of weigh-ins</b> in ' + esc(impName) + '<div class="small" style="margin-top:4px">' + fmtLong(impRows[0].d) + ' to ' + fmtLong(impRows[impRows.length - 1].d) + '. If a day has several readings, the earliest is used.</div>';
+  if (impUnk) { h += '<label class="check" style="border:0"><input type="checkbox" id="imp_kg"' + (impKg ? ' checked' : '') + '> <span>Weights in this file are in kilograms (kg) <span class="muted">\u2014 the file doesn\u2019t say, so please check</span></span></label>'; }
+  else { h += '<p class="small muted" style="margin:6px 0 0">Units read from the file; kg is converted to lb.</p>'; }
+  if (add.length) {
+    h += '<table style="margin-top:6px"><tr><th>Date</th><th class="r">Weight</th></tr>';
+    var show = add.length > 6 ? add.slice(0, 3).concat([null]).concat(add.slice(-3)) : add;
+    for (i = 0; i < show.length; i++) { h += show[i] ? '<tr><td>' + fmtLong(show[i].d) + '</td><td class="r">' + show[i].lb + ' lb</td></tr>' : '<tr><td colspan="2" class="muted">… ' + (add.length - 6) + ' more …</td></tr>'; }
+    h += '</table>';
+  }
+  var notes = [];
+  if (before) { notes.push(before + ' before your start date (' + fmtLong(p.startDate) + ') will be skipped. To include them, move your start date earlier in My plan first.'); }
+  if (future) { notes.push(future + ' future-dated will be skipped.'); }
+  if (bad) { notes.push(bad + ' outside a normal weight range will be skipped. Check the kg setting above.'); }
+  if (notes.length) { h += '<ul class="pts small" style="margin:8px 0 0">' + notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>'; }
+  if (dup) { h += '<label class="check" style="border:0"><input type="checkbox" id="imp_over"> <span>Replace my ' + dup + ' existing weigh-in' + (dup === 1 ? '' : 's') + ' on the same days</span></label>'; }
+  h += add.length ? '<button class="btn gold block" type="button" data-act="impGo" style="margin-top:10px">Import weigh-ins (' + (add.length - dup) + ' new' + (dup ? ', ' + dup + ' already logged' : '') + ')</button>' : '<p class="small" style="margin:8px 0 0"><b>Nothing to import</b> from this file.</p>';
+  h += '</div>';
+  impStatus(h);
+  if ($('imp_kg')) { $('imp_kg').onchange = function () { impKg = this.checked; renderImportPreview(); }; }
+}
+ACT.impGo = function () {
+  if (!impRows) { return; }
+  var over = checked('imp_over'), p = S.profile, n = 0, i, lb, existing = {};
+  for (i = 0; i < S.weights.length; i++) { existing[S.weights[i].date] = true; }
+  for (i = 0; i < impRows.length; i++) {
+    lb = impConvert(impRows[i]);
+    if (impRows[i].d > today() || impRows[i].d < p.startDate || lb < 70 || lb > 800) { continue; }
+    if (existing[impRows[i].d] && !over) { continue; }
+    if (impRows[i].d === p.startDate && over) { p.startWeight = lb; }
+    upsertWeight(impRows[i].d, lb); n++;
+  }
+  impRows = null; save();
+  ACT.tool('weights');
+  var lost = r1(p.startWeight - currentWeight());
+  milestone(currentWeight(), true); save();
+  cheer(n + ' weigh-in' + (n === 1 ? '' : 's') + ' imported', n ? (lost > 0 ? 'Your whole journey is on the chart now: ' + lost + ' lb down since ' + fmtLong(p.startDate) + '. Look how far you’ve come.' : 'Your history is on the chart now. Every weigh-in tells part of the story.') : 'Those days were already in your history.', n > 0 && lost > 0);
+};
+ACT.impSample = function () {
+  var p = S.profile, txt = 'date,weight_lb\n' + p.startDate + ',' + p.startWeight + '\n' + addDays(p.startDate, 7) + ',' + r1(p.startWeight - 1.5) + '\n';
+  try {
+    var blob = new Blob([txt], {type: 'text/csv'}), a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'mymove-weigh-ins-sample.csv';
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.parentNode.removeChild(a); }, 500);
+  } catch (e) { toast('Download not supported here'); }
+};
+function importCardHtml() {
+  var h = '<div class="card"><h2>Import from a file</h2><p class="small">Bring in many weigh-ins at once from Apple Health, a smart-scale app or a spreadsheet. You’ll see a preview before anything is saved.</p>';
+  h += '<label class="btn block" for="imp_file" style="margin:8px 0 0">Choose a file (.csv or export.xml)</label><input type="file" id="imp_file" accept=".csv,.txt,.xml,text/csv,text/plain,text/xml,application/xml" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">';
+  h += '<div id="imp_out"></div>';
+  h += '<details style="margin-top:12px"><summary class="small" style="cursor:pointer;font-weight:700">Where do I get the file?</summary><ul class="pts small" style="margin-top:8px">';
+  h += '<li><b>Apple Health:</b> Health app → your profile picture → <i>Export All Health Data</i> → save to Files. Tap the zip in Files to unzip it, then choose <b>export.xml</b> from the <b>apple_health_export</b> folder. Large exports can take a minute to read.</li>';
+  h += '<li><b>Weight Gurus, Garmin Connect, Fitbit, MyFitnessPal and similar apps:</b> use the app’s or website’s weight-history export (usually CSV). Many scales also sync to Apple Health, which works too.</li>';
+  h += '<li><b>Your own spreadsheet:</b> two columns, a date and a weight, saved as CSV. Dates like 2026-08-31 or 8/31/2026 both work, in lb or kg. <a href="#" data-act="impSample">Download a sample file</a>.</li></ul></details></div>';
+  return h;
+}
+
 /* ---------- Sheet ---------- */
 function openSheet(title, html) { stopTimers(); curSheetMod = null; curTool = null; $('sheettitle').textContent = title; $('sheetbody').innerHTML = html; $('sheetwrap').className = ''; $('sheetbody').scrollTop = 0; document.body.style.overflow = 'hidden'; }
-function closeSheet(rerender) { stopTimers(); $('sheetwrap').className = 'hidden'; $('sheetbody').innerHTML = ''; document.body.style.overflow = ''; if (rerender !== false) { render(); } }
+function closeSheet(rerender) { stopTimers(); curSheetMod = null; curTool = null; toolBack = null; $('sheetwrap').className = 'hidden'; $('sheetbody').innerHTML = ''; document.body.style.overflow = ''; if (rerender !== false) { render(); } }
 ACT.closeSheet = function () { closeSheet(true); };
 ACT.tab = function (v) { if (v === 'log') { S.ui.logDate = today(); } setTab(v); };
 
