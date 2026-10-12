@@ -23,6 +23,7 @@ a{color:#1d4f91}
 header#top{position:sticky;top:0;z-index:20;background:#12284c;color:#ffffff;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .brand{font-size:22px;font-weight:800;letter-spacing:.3px}
 .brand b{color:#f2b632}
+.ver{display:block;font-size:11px;font-weight:600;color:#c9d4e6;letter-spacing:.5px;line-height:1;margin-top:1px}
 #topdate{font-size:14px;color:#c9d4e6;text-align:right}
 main#view{max-width:720px;margin:0 auto;padding:14px 14px 24px}
 h1{font-size:24px;margin:4px 0 10px}
@@ -148,7 +149,7 @@ th,td{overflow-wrap:anywhere;word-wrap:break-word}
 </style>
 </head>
 <body>
-<header id="top"><div class="brand">My<b>MOVE!</b></div><div id="topdate"></div></header>
+<header id="top"><div class="brand">My<b>MOVE!</b><span id="ver" class="ver"></span></div><div id="topdate"></div></header>
 <main id="view"></main>
 <nav id="tabs" class="hidden">
   <button data-act="tab" data-v="today" id="tab-today"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Today</button>
@@ -166,7 +167,7 @@ th,td{overflow-wrap:anywhere;word-wrap:break-word}
 (function () {
 'use strict';
 
-var VERSION = '1.4.1';
+var VERSION = '1.4.2';
 var KEY = 'mymove.v1';
 
 /* ---------- Program content (adapted from the MOVE! Veteran Workbook, 2023) ---------- */
@@ -422,9 +423,11 @@ function setTab(t) {
   render();
   window.scrollTo(0, 0);
 }
+function verFoot() { return '<p class="foot">MyMOVE! v' + VERSION + '</p>'; }
 function render() {
+  $('ver').textContent = 'v' + VERSION;
   $('topdate').innerHTML = S.profile ? 'Week ' + weekNo() + '<br>' + fmtDate(today()) : fmtDate(today());
-  if (!S.profile) { $('tabs').className = 'hidden'; $('view').innerHTML = viewSetup(true); afterSetup(); return; }
+  if (!S.profile) { $('tabs').className = 'hidden'; $('view').innerHTML = viewSetup(true) + verFoot(); afterSetup(); return; }
   $('tabs').className = '';
   var t = S.ui.tab || 'today', h = '';
   if (t === 'today') { h = viewToday(); }
@@ -432,7 +435,7 @@ function render() {
   else if (t === 'program') { h = viewProgram(); }
   else if (t === 'progress') { h = viewProgress(); }
   else { h = viewMore(); }
-  $('view').innerHTML = h;
+  $('view').innerHTML = h + verFoot();
   if (t === 'progress') { drawCharts(); }
 }
 
@@ -1621,7 +1624,7 @@ function importCardHtml() {
 }
 
 /* ---------- Sheet ---------- */
-function openSheet(title, html) { stopTimers(); curSheetMod = null; curTool = null; $('sheettitle').textContent = title; $('sheetbody').innerHTML = html; $('sheetwrap').className = ''; $('sheetbody').scrollTop = 0; document.body.style.overflow = 'hidden'; }
+function openSheet(title, html) { stopTimers(); curSheetMod = null; curTool = null; $('sheettitle').textContent = title; $('sheetbody').innerHTML = html + verFoot(); $('sheetwrap').className = ''; $('sheetbody').scrollTop = 0; document.body.style.overflow = 'hidden'; }
 function closeSheet(rerender) { stopTimers(); curSheetMod = null; curTool = null; toolBack = null; $('sheetwrap').className = 'hidden'; $('sheetbody').innerHTML = ''; document.body.style.overflow = ''; if (rerender !== false) { render(); } }
 ACT.closeSheet = function () { closeSheet(true); };
 ACT.tab = function (v) { if (v === 'log') { S.ui.logDate = today(); } setTab(v); };

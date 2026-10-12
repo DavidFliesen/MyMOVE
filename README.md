@@ -1,4 +1,4 @@
-# MyMOVE! — v1.4.1
+# MyMOVE! — v1.4.2
 
 **A pocket companion for Veterans in the VA MOVE! Weight Management Program.**
 
@@ -153,6 +153,7 @@ icons/
 - **Layout:** works down to 320 px wide. Paired fields stack on narrow phones, and overlays stay below the status bar and notch.
 - **Saved data:** stored under the local storage key `mymove.v1`.
 - **Service worker:** the app page is network-first, so updates arrive when online, and falls back to the cache offline. Icons and the manifest are cache-first.
+- **Version display:** the version shows under the MyMOVE! logo in the header and at the bottom of every page and overlay, read from `VERSION` in `index.html`.
 - **Releasing an update:** bump `VERSION` in `index.html`, `CACHE` in `sw.js`, and the version at the top of this README.
 
 ---
@@ -169,6 +170,7 @@ Program content is adapted and summarized from:
 
 | Version | Date | Notes |
 |---|---|---|
+| 1.4.2 | 2026-10-12 | Version number shown in the header and at the bottom of every page and overlay. |
 | 1.4.1 | 2026-10-12 | Import fixes: the file picker no longer restricts file types (iOS was greying files out) and opens reliably for repeat imports; the preview offers to move your start date back to include older history; an Edit button on the starting weigh-in; Clear all weigh-ins except my start; clear messages for spreadsheet and other unreadable files; the celebration banner no longer blocks taps. |
 | 1.4.0 | 2026-10-12 | Encouragement throughout: milestone celebrations (first pound, every 5 lb, 5/8/10%, goal), new lows, kind messages when weight goes up, a safety note for losing too fast, activity, step, water, streak, SMART goal, module and check-in praise, and a Your wins card on Today. Bulk weigh-in import from Apple Health export.xml and CSV (Weight Gurus, Garmin, Fitbit, MyFitnessPal, spreadsheets), with lb/kg handling, preview, skip rules and optional replace. |
 | 1.3.0 | 2026-10-12 | Daily step count and step goal; built-in food search with automatic calorie calculation by servings, plus remembered My Foods and Save & add another. Layout fixes so fields never overlap or run off-screen, and overlays no longer slide under the status bar. Removed Getting Started and crisis cards from More. Modules complete only via Mark Module Complete (removed setup auto-complete and bulk catch-up); Back to Module button in tools; completed badge. Credit changed to David Fliesen. |
