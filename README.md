@@ -1,4 +1,4 @@
-# MyMOVE! — v1.4.2
+# MyMOVE! — v1.4.3
 
 **A pocket companion for Veterans in the VA MOVE! Weight Management Program.**
 
@@ -81,7 +81,7 @@ It also lets you:
 ### Program
 - **MOVE! Veteran Workbook link:** the official workbook PDF is linked as the app's companion in the Program tab, the More tab, and every module. Each module shows the workbook pages where its lesson appears.
 - Each module is labeled by week. **You're here** marks your current week and **Review** marks earlier ones.
-- **Go to my week** jumps straight to your current module. Inside a module, use **‹ Week / My week / Week ›** to move between weeks.
+- **Go to my week** jumps straight to your current module. Inside a module, a bar at the top shows **‹ previous week**, **Week N of 16** in the center, and **next week ›**, plus a *Go to my week* link when you're reviewing another week.
 - Tools opened from a module have a **‹ Back to Module** button. Opening tools never completes a module; only **Mark Module Complete** does, and completed modules show a green badge.
 - All 16 modules plus 3 mini-modules: Weight and Sleep, Quit Tobacco, and Be Involved in Your Health Care.
 - Each module has plain-language key points and a "Bring it home this week" checklist.
@@ -170,6 +170,7 @@ Program content is adapted and summarized from:
 
 | Version | Date | Notes |
 |---|---|---|
+| 1.4.3 | 2026-10-12 | Weekly module navigation moved to the top: previous week on the left, Week N of 16 in the center, next week on the right. |
 | 1.4.2 | 2026-10-12 | Version number shown in the header and at the bottom of every page and overlay. |
 | 1.4.1 | 2026-10-12 | Import fixes: the file picker no longer restricts file types (iOS was greying files out) and opens reliably for repeat imports; the preview offers to move your start date back to include older history; an Edit button on the starting weigh-in; Clear all weigh-ins except my start; clear messages for spreadsheet and other unreadable files; the celebration banner no longer blocks taps. |
 | 1.4.0 | 2026-10-12 | Encouragement throughout: milestone celebrations (first pound, every 5 lb, 5/8/10%, goal), new lows, kind messages when weight goes up, a safety note for losing too fast, activity, step, water, streak, SMART goal, module and check-in praise, and a Your wins card on Today. Bulk weigh-in import from Apple Health export.xml and CSV (Weight Gurus, Garmin, Fitbit, MyFitnessPal, spreadsheets), with lb/kg handling, preview, skip rules and optional replace. |
